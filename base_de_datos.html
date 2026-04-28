@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Datos Hidrológicos - AquaTerra</title>
+
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  
+</head>
+
+<body>
+
+<!-- HEADER (igual que tu index) -->
+<header class="header-container">
+  <div class="header-left">
+    <img src="Image/AQUATERRA-fondo.png" alt="Logo" class="logo">
+    <div class="text-box">
+      <h1>Consultora AquaTerra</h1>
+      <p>Estudios en hidrología y climatología</p>
+    </div>
+  </div>
+</header>
+
+<!-- NAV -->
+<nav>
+  <ul>
+    <li><a href="index.html#inicio">Inicio</a></li>
+    <li><a href="datos.html">Base de datos</a></li>
+    <li><a href="index.html#temas">Trabajos realizados</a></li>
+    <li><a href="index.html#contacto">Contacto</a></li>
+  </ul>
+</nav>
+
+<!-- MAPA -->
+<section id="mapa-section">
+  <div class="mapa-wrapper">
+    
+    <h2>Estaciones Hidrológicas</h2>
+    <p class="texto-body mapa-subtitle">
+      Visualización espacial de estaciones con disponibilidad de datos hidrometeorológicos en Bolivia.
+    </p>
+
+    <div class="mapa-card">
+      <div id="map"></div>
+    </div>
+
+  </div>
+</section>
+
+<section id="analisis">
+  <h2>Selección de estaciones</h2>
+
+  <div id="lista-estaciones"></div>
+
+  <canvas id="grafica"></canvas>
+
+  <div id="estadisticos"></div>
+</section>
+
+<!-- Scripts -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

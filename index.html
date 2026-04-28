@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="description" content="Consultora en hidrología y climatología">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hidrología - Estudio del ciclo del agua y el clima</title>
+  <link rel="icon" type="image/png" href="Image\AQUATERRA-fondo.png" sizes="16x16">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="script.js"></script>
+</head>
+<body>
+  <header class="header-container">
+
+    <!-- AGRUPAR IZQUIERDA -->
+  <div class="header-left">
+    <img src="Image/AQUATERRA-fondo.png" alt="Logo" class="logo">
+
+    <div class="text-box">
+      <h1>Consultora AquaTerra</h1>
+      <p>Estudios en hidrología y climatología</p>
+    </div>
+  </div>
+
+  <!-- DERECHA -->
+  <div class="menu-dropdown">
+    <button class="dropbtn" onclick="toggleMenu()">
+      Contenido <span class="arrow" id="arrow"></span>
+    </button>
+
+    <div class="dropdown-content" id="menu">
+      <a href="base_de_datos.html">Base de datos</a>
+      <a href="#">Artículos</a>
+      <a href="#">Trabajos realizados</a>
+      <a href="#">Multimedia</a>
+    </div>
+  </div>  
+
+  </header>
+  
+  <nav>
+    <ul>
+      <li><a href="#inicio">Inicio</a></li>
+      <li><a href="#articulos">Publicaciones</a></li>
+      <li><a href="#ciclo">Base de datos</a></li>
+      <li><a href="#servicios">Servicios</a></li>
+      <li><a href="#contacto">Contacto</a></li>
+      <li><a href="#recursos">Recursos</a></li>
+    </ul>
+  </nav>
+  
+  <main>
+    <section id="inicio">
+      <h2>Consultora AquaTerra</h2>
+      <p class="texto-body">Bolivia presenta una configuración territorial particularmente compleja, caracterizada por una alta 
+        variabilidad tanto geográfica como orográfica que abarca desde <strong>regiones andinas de gran altitud hasta llanuras amazónicas 
+        y zonas de transición interandina.</strong></p>
+        
+      <img src="Image/Mapa_cluster_GMM.png" alt="Mapa hidrológico" class="img-mapa">
+
+        <p class="texto-body">Esta diversidad de condiciones topográficas, climáticas e hidrológicas genera dinámicas espaciales y 
+        temporales heterogéneas, lo que dificulta significativamente el análisis y la comprensión de los procesos hidrológicos 
+        en el país. Por lo que realizar <strong>un trabajo de calidad implica trabajar con datos de calidad para una toma de desiciones
+        adecuada.</strong></p>
+        
+        <p class="texto-body">Nuestra consultora especializada en estudios hidrológicos y gestión integral de cuencas, orientada a 
+          brindar soluciones técnicas basadas en evidencia para la planificación y el manejo sostenible del recurso hídrico. 
+          <strong>Contamos con experiencia en análisis hidrometeorológico, modelación y evaluación de disponibilidad 
+          hídrica, así como en la caracterización de riesgos asociados a eventos extremos.</strong> Nuestro trabajo se sustenta en una 
+          amplia base de datos proveniente de fuentes satelitales y de estaciones hidrológicas de libre acceso, lo que nos 
+          permite generar diagnósticos precisos, robustos y adaptados a distintos contextos territoriales.</p>
+        <p class="texto-body">Nuestro portal también funciona como una <strong>plataforma de datos espaciales para la región, concebida para facilitar el 
+          acceso abierto y la consulta eficiente de información hidrometeorológica.</strong> Integra fuentes reconocidas como <a href="https://www.senamhi.gob.bo/" target="_blank"><strong>SENAMHI</strong></a>, <a href="https://www.chc.ucsb.edu/data/chirps" target="_blank"><strong>CHIRPS</strong></a>, 
+          <a href="https://gpm.nasa.gov/data/imerg" target="_blank"><strong>IMERG</strong></a>, <a href="https://www.ncei.noaa.gov/products/climate-data-records/precipitation-persiann" target="_blank"><strong>PERSIANN</strong></a>, entre otras; organizadas bajo criterios técnicos que permiten su uso en análisis, investigación y 
+          toma de decisiones. Asimismo, buscamos ofrecer un servicio integral que contribuya al desarrollo científico, poniendo a 
+          disposición tanto artículos académicos de alcance internacional como los estudios y desarrollos generados por nuestro 
+          propio equipo.</p>
+    </section>
+    
+    <section id="articulos">
+      <h2>Publicaciones</h2>
+
+      <div class="carousel-container">
+    
+        <button class="carousel-btn prev">&#10094;</button>
+
+        <div class="carousel-track">
+
+        <!-- CARD 1 -->
+        <div class="articulo-card">
+          <img src="Image/Figura 1.2.1.png">
+          <div class="overlay">
+            <h3>An Application of the RegCM4 System to Quantify the Effects of Climate Change: Angostura-Bolivia Basin</h3>
+          <a href="https://www.mdpi.com/2073-4441/16/8/1147" target="_blank" class="btn-articulo">
+            Learn more
+            <span class="arrow-circle">
+  <i class="fas fa-arrow-right"></i>
+</span>
+          </a>
+          </div>
+        </div>
+
+        <!-- CARD 2 -->
+        <div class="articulo-card">
+         <img src="Image/articulo2.jpg">
+          <div class="overlay">
+            <h3>Análisis CHIRPS en Bolivia</h3>
+            <a href="#">Learn more</a>
+          </div>
+        </div>
+
+        <!-- CARD 3 -->
+        <div class="articulo-card">
+          <img src="Image/articulo3.jpg">
+          <div class="overlay">
+            <h3>Modelación hidrológica</h3>
+            <a href="#">Learn more</a>
+          </div>
+        </div>
+
+      <!-- Puedes seguir agregando más -->
+      
+        </div>
+
+        <button class="carousel-btn next">&#10095;</button>
+
+      </div>
+    </section>
+
+    <section id="ciclo">
+      <h2>Bases de datos hidrometeorológicas</h2>
+      <div class="info-grid">
+        <div class="info-card">
+          <strong>CHIRPS (Climate Hazards Group InfraRed Precipitation with Stations)</strong>
+          <p class="texto-body">Conjunto de datos de precipitación que combina información satelital y de estaciones 
+            meteorológicas para estimar lluvias con alta resolución (~5 km) desde 1981 con cobertura casi global, siendo 
+            ampliamente utilizado en estudios hidrológicos y climáticos.</p>
+        </div>
+        <div class="info-card">
+          <strong>IMERG (Integrated Multi-satellitE Retrievals for GPM)</strong>
+          <p class="texto-body">Producto de precipitación que combina múltiples sensores satelitales dentro de la misión GPM de la NASA para estimar 
+            lluvias a escala global. Ofrece una alta resolución espacial (~10 km) y temporal (30 min), lo que lo hace especialmente 
+            útil para el monitoreo casi en tiempo real.</p>
+        </div>
+        <div class="info-card">
+          <strong>PERSIANN (Precipitation Estimation from Remotely Sensed Information using Artificial Neural Networks)</strong>
+          <p class="texto-body">Producto que utiliza imágenes satelitales infrarrojas y modelos de redes neuronales para estimar 
+            lluvias a escala global. Con resolución espacial media (~25 km) y ampliamente utilizado, 
+            especialmente en regiones con escasa cobertura de estaciones.</p>
+        </div>
+        <div class="info-card">
+          <strong>CHIRTS (Climate Hazards InfraRed Temperature with Stations)</strong>
+          <p class="texto-body">Conjunto de datos de temperatura que combina información satelital infrarroja con observaciones de estaciones para estimar temperaturas del aire a escala global. Ofrece una resolución espacial de ~5 km y cobertura temporal desde 1983, siendo útil en estudios climáticos, hidrológicos y de variabilidad térmica.</p>
+        </div>
+      </div>
+    </section>
+    
+    <section id="servicios">
+      <h2>Servicios</h2>
+      <ul class="lista">
+        <li>Asesoría y consultora</li>
+        <li>Análisis hidrológico para gestión de agua y/o protección contra crecidas</li>
+        <li>Análisis y gestión de cuencas</li>
+        <li>Proyecciones climáticas bajo escenarios de cambio climático</li>
+        <li>Publicación de artículos científicos</li>
+        <li>Apoyo en trabajos de pre-grado y pos-grado</li>
+      </ul>
+    </section>
+
+    <section id="contacto">
+  <div class="footer-container">
+
+    <div class="footer-col">
+      <p><strong>Teléfono:</strong><br> +591 63438573</p>
+      <p><strong>Correo:</strong><br> michael.lizarazu.rojas@gmail.com</p>
+    </div>
+
+    <div class="footer-col center">
+      <a href="https://instagram.com/tu_usuario" target="_blank" class="social-circle">
+        <i class="fab fa-instagram"></i>
+      </a>
+      <a href="https://facebook.com/tu_usuario" target="_blank" class="social-circle">
+        <i class="fab fa-facebook-f"></i>
+      </a>
+    </div>
+
+    <div class="footer-col right">
+      <a href="base_de_datos.html">Base de datos</a>
+      <a href="#">Noticias nuevas</a>
+      <a href="#">Publicaciones</a>
+    </div>
+
+  </div>
+</section>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
