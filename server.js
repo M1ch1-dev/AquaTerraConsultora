@@ -1,75 +1,54 @@
 const express = require("express");
-const fs = require("fs");
-const csv = require("csv-parser");
 const cors = require("cors");
+const fs = require("fs");
 const path = require("path");
+const csv = require("csv-parser");
 
 const app = express();
 app.use(cors());
 
-const PORT = 3000;
-
-// 📥 leer CSV
 function readCSV(filePath) {
-  return new Promise((resolve, reject) => {
-    const results = [];
-
-    if (!fs.existsSync(filePath)) {
-      return resolve([]); // si no existe, devuelve vacío
-    }
+  return new Promise((resolve) => {
+    const out = [];
+    if (!fs.existsSync(filePath)) return resolve(out);
 
     fs.createReadStream(filePath)
       .pipe(csv())
-      .on("data", (data) => results.push(data))
-      .on("end", () => resolve(results))
-      .on("error", (err) => reject(err));
+      .on("data", (row) => {
+        // 👇 ajusta a tus columnas reales
+        const fecha = new Date(row.date || row.fecha);
+        const valor = parseFloat(row.tp || row.precip);
+
+        if (!isNaN(fecha) && !isNaN(valor)) {
+          out.push({ fecha, valor });
+        }
+      })
+      .on("end", () => resolve(out));
   });
 }
 
-// 📊 agrupar mensual
 function agruparMensual(data) {
-  const mensual = {};
-
-  data.forEach(row => {
-    const fecha = new Date(row.date);   // 👈 ajusta nombre columna
-    const valor = parseFloat(row.tp); // 👈 ajusta nombre columna
-
-    if (isNaN(valor)) return;
-
-    const key = `${fecha.getFullYear()}-${String(fecha.getMonth()+1).padStart(2,'0')}`;
-
-    if (!mensual[key]) mensual[key] = 0;
-    mensual[key] += valor;
+  const out = {};
+  data.forEach(d => {
+    const key = `${d.fecha.getFullYear()}-${String(d.fecha.getMonth()+1).padStart(2,'0')}`;
+    out[key] = (out[key] || 0) + d.valor;
   });
-
-  return mensual;
+  return out;
 }
 
-// 🚀 endpoint principal
-app.get("/data/:estacion", async (req, res) => {
-  const est = req.params.estacion;
+app.get("/data/:est", async (req, res) => {
+  const est = req.params.est;
 
-  const basePath = path.join(__dirname, "Data/Senamhi/Precip", `${est}.csv`);
-  console.log("Buscando:", basePath);
-  console.log("EXISTE:", fs.existsSync(basePath));
+  const base = await readCSV(path.join(__dirname, "Data/Senamhi/Precip", `${est}.csv`));
+  const imerg = await readCSV(path.join(__dirname, "Data/IMERG/Precip", `${est}.csv`));
+  const chirps = await readCSV(path.join(__dirname, "Data/CHIRPS/Precip", `${est}.csv`));
 
-  try {
-    const base = await readCSV(path.join(__dirname, "Data/Senamhi/Precip", `${est}.csv`));
-    const imerg = await readCSV(path.join(__dirname, "Data/IMERG/Precip", `${est}.csv`));
-    const chirps = await readCSV(path.join(__dirname, "Data/CHIRPS/Precip", `${est}.csv`));
-
-    res.json({
-      base: agruparMensual(base),
-      imerg: agruparMensual(imerg),
-      chirps: agruparMensual(chirps)
-    });
-
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  res.json({
+    base: agruparMensual(base),
+    imerg: agruparMensual(imerg),
+    chirps: agruparMensual(chirps)
+  });
 });
 
-app.listen(PORT, () => {
-  console.log(`Servidor en http://localhost:${PORT}`);
-});
-
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log("Servidor en puerto", PORT));
