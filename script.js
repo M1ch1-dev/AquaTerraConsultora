@@ -1,3 +1,7 @@
+const API_URL = window.location.hostname === "127.0.0.1"
+  ? "http://127.0.0.1:3000"
+  : "https://aquaterraconsultora-api.onrender.com;
+
 function toggleMenu() {
   const menu = document.getElementById("menu");
   const arrow = document.getElementById("arrow");
@@ -245,7 +249,7 @@ async function actualizarAnalisis() {
 
   const estacion = checks[0].value;
 
-  const res = await fetch(`http://localhost:3000/data/${estacion}`);
+  const res = await fetch(`${API_URL}/data/${encodeURIComponent(estacion)}`);
   const data = await res.json();
 
   graficar(data);
