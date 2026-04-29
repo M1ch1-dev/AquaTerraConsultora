@@ -345,3 +345,41 @@ function calcularEstadisticos(dataRaw) {
     <p>Nash CHIRPS: ${nashChirps.toFixed(3)}</p>
   `;
 }
+
+function renderizarEstaciones(estaciones) {
+  const contenedor = document.getElementById("lista-estaciones");
+  contenedor.innerHTML = "";
+
+  // Agrupar por departamento
+  const grupos = {};
+
+  estaciones.forEach(est => {
+    if (!grupos[est.departamento]) {
+      grupos[est.departamento] = [];
+    }
+    grupos[est.departamento].push(est);
+  });
+
+  // Crear HTML
+  Object.keys(grupos).forEach(depto => {
+    const div = document.createElement("div");
+    div.className = "departamento";
+
+    const titulo = document.createElement("h3");
+    titulo.textContent = depto;
+    div.appendChild(titulo);
+
+    grupos[depto].forEach(est => {
+      const label = document.createElement("label");
+
+      label.innerHTML = `
+        <input type="checkbox" value="${est.nombre}">
+        ${est.nombre}
+      `;
+
+      div.appendChild(label);
+    });
+
+    contenedor.appendChild(div);
+  });
+}
