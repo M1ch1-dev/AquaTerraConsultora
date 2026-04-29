@@ -634,3 +634,49 @@ footer {
   border-radius: 50%;
   cursor: pointer;
 }
+
+/* CONTENEDOR GENERAL */
+.panel-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  margin: 30px;
+}
+
+/* TARJETAS */
+.panel {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* GRID DE ESTACIONES */
+.grid-estaciones {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 15px;
+}
+
+/* BLOQUE POR DEPARTAMENTO */
+.departamento {
+  background: #f8f9fb;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+/* TÍTULO DEPTO */
+.departamento h3 {
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #333;
+  border-bottom: 1px solid #ddd;
+}
+
+/* LISTA */
+.departamento label {
+  display: block;
+  font-size: 13px;
+  margin: 3px 0;
+  cursor: pointer;
+}
