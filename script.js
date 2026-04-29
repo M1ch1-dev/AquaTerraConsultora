@@ -231,11 +231,20 @@ async function actualizarAnalisis() {
 
   const estacion = checks[0].value;
 
-  const res = await fetch(`${API_URL}/data/${encodeURIComponent(estacion)}`);
-  const data = await res.json();
+  const loader = document.getElementById("loader");
+  if (loader) loader.classList.remove("hidden");
 
-  graficar(data);
-  calcularEstadisticos(data);
+  try {
+    const res = await fetch(`${API_URL}/data/${encodeURIComponent(estacion)}`);
+    const data = await res.json();
+
+    graficar(data);
+    calcularEstadisticos(data);
+  } catch (err) {
+    console.error(err);
+  } finally {
+    if (loader) loader.classList.add("hidden");
+  }
 }
 
 // =======================
