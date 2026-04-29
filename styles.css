@@ -707,3 +707,27 @@ footer {
     transform: rotate(360deg);
   }
 }
+
+.panel {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 15px;
+  margin-top: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.grafico-panel {
+  height: 320px; /* 👈 aquí controlas la altura del gráfico */
+  width: 100%;
+  margin-top: 10px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#grafico {
+  width: 100% !important;
+  height: 100% !important;
+}
