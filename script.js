@@ -1,6 +1,6 @@
 const API_URL = window.location.hostname === "127.0.0.1"
   ? "http://127.0.0.1:3000"
-  : "https://aquaterraconsultora-api.onrender.com;
+  : "https://aquaterraconsultora-api.onrender.com";
 
 function toggleMenu() {
   const menu = document.getElementById("menu");
