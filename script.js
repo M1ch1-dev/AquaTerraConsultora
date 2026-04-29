@@ -297,10 +297,31 @@ function graficar(dataRaw) {
     },
     options: {
       responsive: true,
+      maintainAspectRatio: false,
       interaction: {
         mode: 'index',
         intersect: false
+      },
+      scales: {
+    x: {
+      title: {
+        display: true,
+        text: "Años"
+      },
+      ticks: {
+        autoSkip: true,
+        maxTicksLimit: 10
       }
+    },
+
+    y: {
+      title: {
+        display: true,
+        text: "Precipitación mensual acumulada [mm]"
+      }
+    }
+  }
+      
     }
   });
 }
