@@ -1,0 +1,75 @@
+﻿No,Code,Estation,Departamento,Provincia,Latitud,Longitud,Altitud
+1,E108,Calacoto,La Paz,Pacajes,-17.28055556,-68.63555556,3830
+2,E109,Camata,La Paz,Muñecas,-15.24833333,-68.745,2250
+3,E119,Collana,La Paz,Aroma,-16.90361111,-68.28333333,3911
+4,E121,Copacabana,La Paz,Manco Kapac,-16.16916667,-69.08861111,3870
+5,E125,El Alto Aeropuerto,La Paz,Murillo,-16.51027778,-68.19861111,4135
+6,E126,El Belen,La Paz,Omasuyos,-16.01638889,-68.69777778,3833
+7,E128,Hichucota,La Paz,Los Andes,-16.17666667,-68.38111111,4460
+8,E136,Laykacota,La Paz,Murillo,-16.50444444,-68.12305556,3635
+9,E137,Luribay ,La Paz,Loayza,-17.06138889,-67.66194444,2564
+10,E149,San Juan Huancollo,La Paz,Ingavi,-16.58555556,-68.96666667,3829
+11,E152,Santiago de Machaca,La Paz,Gral. Jose Manuel Pando,-17.06666667,-69.19944444,3883
+12,E160,Villa Puni,La Paz,Camacho,-15.66638889,-69.16722222,3835
+13,E210,Oruro Aeropuerto,Oruro,Cercado,-17.95277778,-67.07972222,3701
+14,E307,Chinoli,Potosí,Jose Maria Linares,-19.64805556,-65.36111111,3296
+15,E310,Colcha K,Potosí,Nor Lipez,-20.73666667,-67.65833333,3780
+16,E315,Mojo,Potosí,Modesto Omiste,-21.829167,-65.5505556,3422
+17,E323,Potosi Los Pinos,Potosí,Tomas Frias,-19.56305556,-65.7605556,3950
+18,E324,Puna,Potosí,Jose Maria Linares,-19.79722222,-65.50333333,3291
+19,E326,Ravelo,Potosí,Chayanta,-18.80472222,-65.51194444,3200
+20,E341,Tupiza,Potosí,Sud Chichas,-21.43833333,-65.71527778,2923
+21,E342,Uyuni,Potosí,Antonio Quijarro,-20.47222222,-66.83138889,3680
+22,E343,Villazon ,Potosí,Modesto Omiste,-22.0914,-65.59954,3443
+23,E345,Yocalla,Potosí,Tomas Frias,-19.38888889,-65.91027778,3426
+24,E404,Arani,Cochabamba,Arani,-17.57361111,-65.75444444,2767
+25,E407,Capinota,Cochabamba,Capinota,-17.71,-65.26527778,2406
+26,E411,Cochabamba Aeropuerto,Cochabamba,Cercado,-17.41611111,-66.17444444,2548
+27,E412,Colomi,Cochabamba,Chapare,-17.33611111,-65.87083333,3309
+28,E413,Cristal Mayu,Cochabamba,Chapare,-17.0075,-65.64083333,516
+29,E416,La violeta ,Cochabamba,Quillacollo,-17.34722222,-66.23166667,2614
+30,E422,Parotani,Cochabamba,Quillacollo,-17.56611111,-66.34361111,2493
+31,E423,Sarco,Cochabamba,Cercado,-17.384167,-66.175556,2857
+32,E424,Tarata,Cochabamba,Esteban Arce,-17.608611,-66.022778,2775
+33,E503,Chuqui Chuqui,Sucre,Oropeza,-18.83111111,-65.1225,1792
+34,E506,El villar,Sucre,Tomina,-19.63111111,-64.30694444,2080
+35,E507,La torre,Sucre,Nor Cinti,-20.616789,-65.194726,2420
+36,E517,Padilla,Sucre,Tomina,-19.30222222,-64.30222222,2102
+37,E520,Redencion Pampa,Sucre,Zudañes,-18.82777778,-64.62611111,2465
+38,E522,San Lucas,Sucre,Nor Cinti,-20.1025,-65.13333333,3047
+39,E525,Sucre SENAMHI,Sucre,Oropeza,-19.039881,-65.263824,2890
+40,E526,Talula Tako Tako,Sucre,Oropeza,-19.11,-65.40527778,2859
+41,E527,Tarabuco,Sucre,Yamparaez,-19.18055556,-64.91333333,3284
+42,E616,Entre Rios (TJA),Tarija,O'Connor,-21.50305556,-64.17055556,1260
+43,E626,Palmar Grande,Tarija,Gran Chaco,-21.53138889,-63.44194444,464
+44,E635,San Jacinto Sud,Tarija,Cercado,-21.61027778,-64.72,1820
+45,E640,Tarija Aeropuerto,Tarija,Cercado,-21.549238,-64.707591,1875
+46,E648,Villamontes Aeropuerto,Tarija,Gran Chaco,-21.25472222,-63.4075,360
+47,E649,Yacuiba Aeropuerto,Tarija,Gran Chaco,-21.965556,-63.654444,580
+48,E650,Ascensión de Guarayos Aerop,Santa Cruz,Guarayos,-15.9153,-63.169201,236
+49,E705,Camiri Aeropuerto,Santa Cruz,Cordillera,-20.00666667,-63.52583333,794
+50,E706,Comarapa,Santa Cruz,Manuel Maria Caballero,-17.91361111,-64.52972222,1824
+51,E707,Concepcion Aeropuerto SCZ,Santa Cruz,ñuflo de Chavez,-16.13833333,-62.0275,497
+52,E709,Trompillo Aeropuerto,Santa Cruz,Andrés Ibañez,-17.805,-63.17805556,413
+53,E710,Minero (Unagro),Santa Cruz,Obispo Santistéban,-17.11,-63.241667,245
+54,E714,Okinawa I,Santa Cruz,Warnes,-17.21666667,-62.883333,252
+55,E715,Puerto Suarez Aeropuerto,Santa Cruz,German Busch,-18.9788889,-57.81916667,234
+56,E716,Roboré Aeropuerto,Santa Cruz,Chiquitos,-18.32972222,-59.76333333,266
+57,E718,San Ignacio de Velasco Aerop,Santa Cruz,Velasco,-16.38166667,-60.9619444,415
+58,E719,San Javier Aeropuerto,Santa Cruz,ñuflo de Chavez,-16.271389,-62.470833,234
+59,E720,San Jose de Chiquitos Aerop,Santa Cruz,Chiquitos,-17.83222222,-60.74416667,285
+60,E721,San Juan de Yapacaní,Santa Cruz,Ichilo,-17.25,-63.833333,350
+61,E722,San Julian (F),Santa Cruz,ñuflo de Chavez,-16.91027778,-62.62583333,249
+62,E723,San Matias Aeropuerto,Santa Cruz,Angel Sandoval,-16.33166667,-58.39916667,285
+63,E726,Vallegrande Aeropuerto,Santa Cruz,Vallegrande,-18.4819444,-64.10805556,2030
+64,E727,Viru Viru Aeropuerto,Santa Cruz,Warnes,-17.64861111,-63.13888889,378
+65,E803,Magdalena Aeropuerto,Beni,Iténez,-13.26111111,-64.05972222,141
+66,E804,Rurrenabaque Aeropuerto (F),Beni,Gral. J. Ballivian,-14.429444,-67.502778,204
+67,E805,Riberalta Aeropuerto,Beni,Vaca Diez,-11.00666667,-66.07611111,141
+68,E807,San Borja Aeropuerto,Beni,Gral. J. Ballivian,-14.85833333,-66.73861111,194
+69,E808,San Ignacio de Moxos Aerop,Beni,Moxos,-14.80194444,-65.63222222,160
+70,E809,San Joaquin Aeropuerto,Beni,Mamore,-13.04722222,-64.66583333,139
+71,E810,San Ramón Aeropuerto,Beni,Mamore,-13.26444444,-64.60555556,139
+72,E811,Santa Ana del Yacuma Aerop,Beni,Yacuma,-13.76166667,-65.43444444,144
+73,E813,Trinidad Aeropuerto,Beni,Cercado,-14.82333333,-64.91638889,156
+74,E901,Cobija Aeropuerto,Pando,Suarez,-11.03972222,-68.78027778,233
