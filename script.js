@@ -26,99 +26,112 @@ function toggleMenu() {
 // =======================
 document.addEventListener("DOMContentLoaded", () => {
 
-  // =========================
-  // MAPA
-  // =========================
-  const map = L.map('map', { zoomControl: false })
-    .setView([-16.5, -64.5], 5);
-
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap'
-  }).addTo(map);
+  const mapContainer = document.getElementById("map");
 
   // =========================
-  // ZOOM PERSONALIZADO
+  // SI EXISTE MAPA → INICIALIZAR
   // =========================
-  const ZoomControl = L.Control.extend({
-    options: { position: 'topright' },
+  if (mapContainer) {
 
-    onAdd: function () {
-      const container = L.DomUtil.create('div', 'custom-zoom-control');
+    const map = L.map('map', { zoomControl: false })
+      .setView([-16.5, -64.5], 5);
 
-      const zoomIn = L.DomUtil.create('button', 'zoom-btn', container);
-      zoomIn.innerHTML = '+';
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap'
+    }).addTo(map);
 
-      const slider = L.DomUtil.create('input', 'zoom-slider', container);
-      slider.type = 'range';
-      slider.min = map.getMinZoom();
-      slider.max = map.getMaxZoom();
-      slider.value = map.getZoom();
+    // =========================
+    // ZOOM PERSONALIZADO
+    // =========================
+    const ZoomControl = L.Control.extend({
+      options: { position: 'topright' },
 
-      const zoomOut = L.DomUtil.create('button', 'zoom-btn', container);
-      zoomOut.innerHTML = '−';
+      onAdd: function () {
+        const container = L.DomUtil.create('div', 'custom-zoom-control');
 
-      L.DomEvent.disableClickPropagation(container);
+        const zoomIn = L.DomUtil.create('button', 'zoom-btn', container);
+        zoomIn.innerHTML = '+';
 
-      zoomIn.onclick = () => map.zoomIn();
-      zoomOut.onclick = () => map.zoomOut();
-      slider.oninput = (e) => map.setZoom(parseInt(e.target.value));
-
-      map.on('zoomend', () => {
+        const slider = L.DomUtil.create('input', 'zoom-slider', container);
+        slider.type = 'range';
+        slider.min = map.getMinZoom();
+        slider.max = map.getMaxZoom();
         slider.value = map.getZoom();
-      });
 
-      return container;
-    }
-  });
+        const zoomOut = L.DomUtil.create('button', 'zoom-btn', container);
+        zoomOut.innerHTML = '−';
 
-  map.addControl(new ZoomControl());
+        L.DomEvent.disableClickPropagation(container);
 
-  // =========================
-  // CAPAS
-  // =========================
-  const estacionesLayer = L.layerGroup().addTo(map);
-  const riosLayer = L.layerGroup();
-  const departamentosLayer = L.layerGroup();
+        zoomIn.onclick = () => map.zoomIn();
+        zoomOut.onclick = () => map.zoomOut();
+        slider.oninput = (e) => map.setZoom(parseInt(e.target.value));
 
-  const capasControl = L.control.layers(null, {
-    "Estaciones": estacionesLayer,
-    "Ríos": riosLayer,
-    "Departamentos": departamentosLayer
-  }, { position: 'topright' }).addTo(map);
+        map.on('zoomend', () => {
+          slider.value = map.getZoom();
+        });
 
-  const container = capasControl.getContainer();
-  container.addEventListener('mouseenter', () => {
-    container.classList.add('leaflet-control-layers-expanded');
-  });
-  container.addEventListener('mouseleave', () => {
-    container.classList.remove('leaflet-control-layers-expanded');
-  });
-
-  // =========================
-  // CARGAR ESTACIONES (MAPA + LISTA)
-  // =========================
-  cargarEstaciones(estacionesLayer);
-
-  // =========================
-  // GEOJSON
-  // =========================
-  fetch('json/Mapa_limites.geojson')
-    .then(res => res.json())
-    .then(data => {
-      const geo = L.geoJSON(data, {
-        style: { color: "#403f3f", weight: 0.8, fillOpacity: 0 }
-      });
-      geo.eachLayer(layer => departamentosLayer.addLayer(layer));
+        return container;
+      }
     });
 
-  fetch('json/bol_rios1m.geojson')
-    .then(res => res.json())
-    .then(data => {
-      const geo = L.geoJSON(data, {
-        style: { color: "#00b4d8", weight: 1.5 }
-      });
-      geo.eachLayer(layer => riosLayer.addLayer(layer));
+    map.addControl(new ZoomControl());
+
+    // =========================
+    // CAPAS
+    // =========================
+    const estacionesLayer = L.layerGroup().addTo(map);
+    const riosLayer = L.layerGroup();
+    const departamentosLayer = L.layerGroup();
+
+    const capasControl = L.control.layers(null, {
+      "Estaciones": estacionesLayer,
+      "Ríos": riosLayer,
+      "Departamentos": departamentosLayer
+    }, { position: 'topright' }).addTo(map);
+
+    const container = capasControl.getContainer();
+    container.addEventListener('mouseenter', () => {
+      container.classList.add('leaflet-control-layers-expanded');
     });
+    container.addEventListener('mouseleave', () => {
+      container.classList.remove('leaflet-control-layers-expanded');
+    });
+
+    // =========================
+    // CARGAR ESTACIONES (MAPA + LISTA)
+    // =========================
+    cargarEstaciones(estacionesLayer);
+
+    // =========================
+    // GEOJSON
+    // =========================
+    fetch('json/Mapa_limites.geojson')
+      .then(res => res.json())
+      .then(data => {
+        const geo = L.geoJSON(data, {
+          style: { color: "#403f3f", weight: 0.8, fillOpacity: 0 }
+        });
+        geo.eachLayer(layer => departamentosLayer.addLayer(layer));
+      })
+      .catch(err => console.error("Error departamentos:", err));
+
+    fetch('json/bol_rios1m.geojson')
+      .then(res => res.json())
+      .then(data => {
+        const geo = L.geoJSON(data, {
+          style: { color: "#00b4d8", weight: 1.5 }
+        });
+        geo.eachLayer(layer => riosLayer.addLayer(layer));
+      })
+      .catch(err => console.error("Error ríos:", err));
+
+  } else {
+    // =========================
+    // SI NO HAY MAPA → SOLO LISTA
+    // =========================
+    cargarEstaciones(null);
+  }
 });
 
 // =======================
@@ -253,7 +266,10 @@ function unificarFechas(data) {
 let chart;
 
 function graficar(dataRaw) {
-  const ctx = document.getElementById("grafico");
+  const canvas = document.getElementById("grafico");
+  if (!canvas) return;
+
+  const ctx = canvas.getContext("2d");
   if (!ctx) return;
 
   const data = unificarFechas(dataRaw);
@@ -270,7 +286,13 @@ function graficar(dataRaw) {
         { label: "CHIRPS", data: data.chirps }
       ]
     },
-    options: { responsive: true }
+    options: {
+      responsive: true,
+      interaction: {
+        mode: 'index',
+        intersect: false
+      }
+    }
   });
 }
 
