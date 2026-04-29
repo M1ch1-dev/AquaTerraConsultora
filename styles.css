@@ -718,9 +718,14 @@ footer {
 }
 
 .grafico-panel {
-  height: 320px; /* 👈 aquí controlas la altura del gráfico */
   width: 100%;
-  margin-top: 10px;
+  height: 320px;
+
+  border: 2px solid black;  
+  border-radius: 8px;
+
+  padding: 10px;
+  background: white;
 
   display: flex;
   align-items: center;
