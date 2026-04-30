@@ -361,7 +361,7 @@ function graficar(dataRaw, estacion) {
   }
       
     }
-  });
+  };
 }
 
 // =======================
