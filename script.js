@@ -6,22 +6,6 @@ const API_URL = window.location.hostname === "127.0.0.1"
   : "https://aquaterraconsultora-api.onrender.com";
 
 // =======================
-// MENU
-// =======================
-function toggleMenu() {
-  const menu = document.getElementById("menu");
-  const arrow = document.getElementById("arrow");
-
-  if (!menu) return;
-
-  menu.classList.toggle("show");
-
-  if (arrow) {
-    arrow.classList.toggle("rotate");
-  }
-}
-
-// =======================
 // ESTADO GLOBAL
 // =======================
 let datosActuales = null;
@@ -34,9 +18,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const mapContainer = document.getElementById("map");
 
-  // =========================
-  // SI EXISTE MAPA → INICIALIZAR
-  // =========================
   if (mapContainer) {
 
     const map = L.map('map', { zoomControl: false })
@@ -46,96 +27,27 @@ document.addEventListener("DOMContentLoaded", () => {
       attribution: '&copy; OpenStreetMap'
     }).addTo(map);
 
-    // =========================
-    // ZOOM PERSONALIZADO
-    // =========================
-    const ZoomControl = L.Control.extend({
-      options: { position: 'topright' },
-
-      onAdd: function () {
-        const container = L.DomUtil.create('div', 'custom-zoom-control');
-
-        const zoomIn = L.DomUtil.create('button', 'zoom-btn', container);
-        zoomIn.innerHTML = '+';
-
-        const slider = L.DomUtil.create('input', 'zoom-slider', container);
-        slider.type = 'range';
-        slider.min = map.getMinZoom();
-        slider.max = map.getMaxZoom();
-        slider.value = map.getZoom();
-
-        const zoomOut = L.DomUtil.create('button', 'zoom-btn', container);
-        zoomOut.innerHTML = '−';
-
-        L.DomEvent.disableClickPropagation(container);
-
-        zoomIn.onclick = () => map.zoomIn();
-        zoomOut.onclick = () => map.zoomOut();
-        slider.oninput = (e) => map.setZoom(parseInt(e.target.value));
-
-        map.on('zoomend', () => {
-          slider.value = map.getZoom();
-        });
-
-        return container;
-      }
-    });
-
-    map.addControl(new ZoomControl());
-
-    // =========================
-    // CAPAS
-    // =========================
     const estacionesLayer = L.layerGroup().addTo(map);
     const riosLayer = L.layerGroup();
     const departamentosLayer = L.layerGroup();
 
-    const capasControl = L.control.layers(null, {
+    L.control.layers(null, {
       "Estaciones": estacionesLayer,
       "Ríos": riosLayer,
       "Departamentos": departamentosLayer
-    }, { position: 'topright' }).addTo(map);
+    }).addTo(map);
 
-    const container = capasControl.getContainer();
-    container.addEventListener('mouseenter', () => {
-      container.classList.add('leaflet-control-layers-expanded');
-    });
-    container.addEventListener('mouseleave', () => {
-      container.classList.remove('leaflet-control-layers-expanded');
-    });
-
-    // =========================
-    // CARGAR ESTACIONES (MAPA + LISTA)
-    // =========================
     cargarEstaciones(estacionesLayer);
 
-    // =========================
-    // GEOJSON
-    // =========================
     fetch('json/Mapa_limites.geojson')
       .then(res => res.json())
-      .then(data => {
-        const geo = L.geoJSON(data, {
-          style: { color: "#403f3f", weight: 0.8, fillOpacity: 0 }
-        });
-        geo.eachLayer(layer => departamentosLayer.addLayer(layer));
-      })
-      .catch(err => console.error("Error departamentos:", err));
+      .then(data => L.geoJSON(data).addTo(departamentosLayer));
 
     fetch('json/bol_rios1m.geojson')
       .then(res => res.json())
-      .then(data => {
-        const geo = L.geoJSON(data, {
-          style: { color: "#00b4d8", weight: 1.5 }
-        });
-        geo.eachLayer(layer => riosLayer.addLayer(layer));
-      })
-      .catch(err => console.error("Error ríos:", err));
+      .then(data => L.geoJSON(data).addTo(riosLayer));
 
   } else {
-    // =========================
-    // SI NO HAY MAPA → SOLO LISTA
-    // =========================
     cargarEstaciones(null);
   }
 });
@@ -179,26 +91,22 @@ async function cargarEstaciones(estacionesLayer) {
 }
 
 // =======================
-// AGRUPAR Y MOSTRAR
+// RENDER ESTACIONES
 // =======================
 function renderizarEstaciones(estaciones) {
   const contenedor = document.getElementById("lista-estaciones");
   if (!contenedor) return;
 
   contenedor.innerHTML = "";
-
   const grupos = {};
 
   estaciones.forEach(est => {
-    if (!grupos[est.departamento]) {
-      grupos[est.departamento] = [];
-    }
+    if (!grupos[est.departamento]) grupos[est.departamento] = [];
     grupos[est.departamento].push(est);
   });
 
   Object.keys(grupos).forEach(depto => {
     const div = document.createElement("div");
-    div.className = "departamento";
 
     const titulo = document.createElement("h3");
     titulo.textContent = depto;
@@ -206,12 +114,7 @@ function renderizarEstaciones(estaciones) {
 
     grupos[depto].forEach(est => {
       const label = document.createElement("label");
-
-      label.innerHTML = `
-        <input type="checkbox" value="${est.nombre}">
-        ${est.nombre}
-      `;
-
+      label.innerHTML = `<input type="checkbox" value="${est.nombre}"> ${est.nombre}`;
       div.appendChild(label);
     });
 
@@ -223,9 +126,7 @@ function renderizarEstaciones(estaciones) {
 // EVENTO CHECK
 // =======================
 document.addEventListener("change", (e) => {
-  if (e.target.type === "checkbox") {
-    actualizarAnalisis();
-  }
+  if (e.target.type === "checkbox") actualizarAnalisis();
 });
 
 // =======================
@@ -249,6 +150,7 @@ async function actualizarAnalisis() {
 
     graficar(data, estacion);
     calcularEstadisticos(data);
+
   } catch (err) {
     console.error(err);
   } finally {
@@ -279,43 +181,34 @@ function unificarFechas(data) {
 }
 
 // =======================
-// GRAFICAR
+// PLUGIN LEYENDA TOP RIGHT
 // =======================
 const legendTopRightPlugin = {
   id: 'legendTopRight',
-
   afterDraw(chart) {
-    const { ctx, chartArea } = chart;
     const legend = chart.legend;
-
     if (!legend) return;
 
+    const { ctx, chartArea } = chart;
     const padding = 10;
 
-    const x = chartArea.right - legend.width - padding;
-    const y = chartArea.top + padding;
-
-    legend.top = y;
-    legend.left = x;
+    legend.top = chartArea.top + padding;
+    legend.left = chartArea.right - legend.width - padding;
 
     legend.draw(ctx);
   }
 };
 
+// =======================
+// GRAFICAR
+// =======================
 let chart;
 
 function graficar(dataRaw, estacion) {
   const canvas = document.getElementById("grafico");
   if (!canvas) return;
-  
-  const titulo = document.getElementById("titulo-estacion");
-  if (titulo) {
-    titulo.textContent = `Estación: ${estacion}`;
-  }
-  
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return;
 
+  const ctx = canvas.getContext("2d");
   const data = unificarFechas(dataRaw);
 
   if (chart) chart.destroy();
@@ -338,38 +231,36 @@ function graficar(dataRaw, estacion) {
         mode: 'index',
         intersect: false
       },
-      
-      
-    legend: {
-      display: true,
-      position: 'top'
-    }
-  },
-      
-      scales: {
-    x: {
-      title: {
-        display: true,
-        text: "Años"
-      },
-      ticks: {
-        autoSkip: true,
-        maxTicksLimit: 10,
-        callback: function(value, index, ticks){
-          const label = this.getLabelForValue(value);
-          return label.split("-")[0];
-      }
-    }
-  },
 
-    y: {
-      title: {
-        display: true,
-        text: "Precipitación mensual [mm]"
+      plugins: {
+        legend: {
+          display: true,
+          position: 'chartArea' // clave
+        }
+      },
+
+      scales: {
+        x: {
+          title: {
+            display: true,
+            text: "Años"
+          },
+          ticks: {
+            autoSkip: true,
+            maxTicksLimit: 10,
+            callback: function(value) {
+              const label = this.getLabelForValue(value);
+              return label.split("-")[0];
+            }
+          }
+        },
+        y: {
+          title: {
+            display: true,
+            text: "Precipitación mensual [mm]"
+          }
+        }
       }
-    }
-  }
-      
     }
   });
 }
@@ -379,7 +270,6 @@ function graficar(dataRaw, estacion) {
 // =======================
 function nash(obs, sim) {
   const mean = obs.reduce((a,b)=>a+b,0) / obs.length;
-
   let num = 0, den = 0;
 
   for (let i = 0; i < obs.length; i++) {
@@ -411,7 +301,6 @@ function calcularEstadisticos(dataRaw) {
 // =======================
 // DESCARGA DATOS
 // =======================
-
 function descargarDatos(tipo) {
   if (!datosActuales) {
     alert("Primero selecciona una estación");
