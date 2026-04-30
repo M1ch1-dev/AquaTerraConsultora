@@ -22,6 +22,12 @@ function toggleMenu() {
 }
 
 // =======================
+// ESTADO GLOBAL
+// =======================
+let datosActuales = null;
+let estacionActual = null;
+
+// =======================
 // INICIO GENERAL
 // =======================
 document.addEventListener("DOMContentLoaded", () => {
@@ -231,6 +237,11 @@ async function actualizarAnalisis() {
 
   const estacion = checks[0].value;
 
+  const titulo = document.getElementById("titulo-estacion");
+  if (titulo) {
+    titulo.textContent = `Estación: ${estacion}`;
+  }
+
   const loader = document.getElementById("loader");
   if (loader) loader.classList.remove("hidden");
 
@@ -238,7 +249,10 @@ async function actualizarAnalisis() {
     const res = await fetch(`${API_URL}/data/${encodeURIComponent(estacion)}`);
     const data = await res.json();
 
-    graficar(data);
+    datosActuales = data;
+    estacionActual = estacion;
+
+    graficar(data, estacion);
     calcularEstadisticos(data);
   } catch (err) {
     console.error(err);
@@ -274,10 +288,15 @@ function unificarFechas(data) {
 // =======================
 let chart;
 
-function graficar(dataRaw) {
+function graficar(dataRaw, estacion) {
   const canvas = document.getElementById("grafico");
   if (!canvas) return;
-
+  
+  const titulo = document.getElementById("titulo-estacion");
+  if (titulo) {
+    titulo.textContent = `Estación: ${estacion}`;
+  }
+  
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
 
@@ -302,6 +321,21 @@ function graficar(dataRaw) {
         mode: 'index',
         intersect: false
       },
+      
+      plugins: {
+    title: {
+      display: true,
+      text: `Serie de precipitación mensual - Estación ${estacion}`,
+      font: {
+        size: 16
+      }
+    },
+    legend: {
+      display: true,
+      position: 'top'
+    }
+  },
+      
       scales: {
     x: {
       title: {
@@ -310,14 +344,14 @@ function graficar(dataRaw) {
       },
       ticks: {
         autoSkip: true,
-        maxTicksLimit: 10
+        maxTicksLimit: 4
       }
     },
 
     y: {
       title: {
         display: true,
-        text: "Precipitación mensual acumulada [mm]"
+        text: "Precipitación mensual [mm]"
       }
     }
   }
@@ -358,4 +392,45 @@ function calcularEstadisticos(dataRaw) {
     <p><strong>Nash IMERG:</strong> ${nashI.toFixed(3)}</p>
     <p><strong>Nash CHIRPS:</strong> ${nashC.toFixed(3)}</p>
   `;
+}
+
+// =======================
+// DESCARGA DATOS
+// =======================
+
+function descargarDatos(tipo) {
+  if (!datosActuales) {
+    alert("Primero selecciona una estación");
+    return;
+  }
+
+  const data = unificarFechas(datosActuales);
+
+  let contenido = "fecha";
+
+  if (tipo === "base" || tipo === "all") contenido += ",SENAMHI";
+  if (tipo === "imerg" || tipo === "all") contenido += ",IMERG";
+  if (tipo === "chirps" || tipo === "all") contenido += ",CHIRPS";
+
+  contenido += "\n";
+
+  for (let i = 0; i < data.labels.length; i++) {
+    let fila = data.labels[i];
+
+    if (tipo === "base" || tipo === "all") fila += `,${data.base[i]}`;
+    if (tipo === "imerg" || tipo === "all") fila += `,${data.imerg[i]}`;
+    if (tipo === "chirps" || tipo === "all") fila += `,${data.chirps[i]}`;
+
+    contenido += fila + "\n";
+  }
+
+  const blob = new Blob([contenido], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `datos_${estacionActual}_${tipo}.csv`;
+  a.click();
+
+  URL.revokeObjectURL(url);
 }
