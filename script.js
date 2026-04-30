@@ -6,6 +6,22 @@ const API_URL = window.location.hostname === "127.0.0.1"
   : "https://aquaterraconsultora-api.onrender.com";
 
 // =======================
+// MENU
+// =======================
+function toggleMenu() {
+  const menu = document.getElementById("menu");
+  const arrow = document.getElementById("arrow");
+
+  if (!menu) return;
+
+  menu.classList.toggle("show");
+
+  if (arrow) {
+    arrow.classList.toggle("rotate");
+  }
+}
+
+// =======================
 // ESTADO GLOBAL
 // =======================
 let datosActuales = null;
@@ -27,25 +43,83 @@ document.addEventListener("DOMContentLoaded", () => {
       attribution: '&copy; OpenStreetMap'
     }).addTo(map);
 
+    // =========================
+    // ZOOM PERSONALIZADO
+    // =========================
+    const ZoomControl = L.Control.extend({
+      options: { position: 'topright' },
+
+      onAdd: function () {
+        const container = L.DomUtil.create('div', 'custom-zoom-control');
+
+        const zoomIn = L.DomUtil.create('button', 'zoom-btn', container);
+        zoomIn.innerHTML = '+';
+
+        const slider = L.DomUtil.create('input', 'zoom-slider', container);
+        slider.type = 'range';
+        slider.min = map.getMinZoom();
+        slider.max = map.getMaxZoom();
+        slider.value = map.getZoom();
+
+        const zoomOut = L.DomUtil.create('button', 'zoom-btn', container);
+        zoomOut.innerHTML = '−';
+
+        L.DomEvent.disableClickPropagation(container);
+
+        zoomIn.onclick = () => map.zoomIn();
+        zoomOut.onclick = () => map.zoomOut();
+        slider.oninput = (e) => map.setZoom(parseInt(e.target.value));
+
+        map.on('zoomend', () => {
+          slider.value = map.getZoom();
+        });
+
+        return container;
+      }
+    });
+
+    map.addControl(new ZoomControl());
+
+    // =========================
+    // CAPAS
+    // =========================
     const estacionesLayer = L.layerGroup().addTo(map);
     const riosLayer = L.layerGroup();
     const departamentosLayer = L.layerGroup();
 
-    L.control.layers(null, {
+    const capasControl = L.control.layers(null, {
       "Estaciones": estacionesLayer,
       "Ríos": riosLayer,
       "Departamentos": departamentosLayer
-    }).addTo(map);
+    }, { position: 'topright' }).addTo(map);
+
+    const container = capasControl.getContainer();
+    container.addEventListener('mouseenter', () => {
+      container.classList.add('leaflet-control-layers-expanded');
+    });
+    container.addEventListener('mouseleave', () => {
+      container.classList.remove('leaflet-control-layers-expanded');
+    });
 
     cargarEstaciones(estacionesLayer);
 
     fetch('json/Mapa_limites.geojson')
       .then(res => res.json())
-      .then(data => L.geoJSON(data).addTo(departamentosLayer));
+      .then(data => {
+        const geo = L.geoJSON(data, {
+          style: { color: "#403f3f", weight: 0.8, fillOpacity: 0 }
+        });
+        geo.eachLayer(layer => departamentosLayer.addLayer(layer));
+      });
 
     fetch('json/bol_rios1m.geojson')
       .then(res => res.json())
-      .then(data => L.geoJSON(data).addTo(riosLayer));
+      .then(data => {
+        const geo = L.geoJSON(data, {
+          style: { color: "#00b4d8", weight: 1.5 }
+        });
+        geo.eachLayer(layer => riosLayer.addLayer(layer));
+      });
 
   } else {
     cargarEstaciones(null);
@@ -98,6 +172,7 @@ function renderizarEstaciones(estaciones) {
   if (!contenedor) return;
 
   contenedor.innerHTML = "";
+
   const grupos = {};
 
   estaciones.forEach(est => {
@@ -208,6 +283,11 @@ function graficar(dataRaw, estacion) {
   const canvas = document.getElementById("grafico");
   if (!canvas) return;
 
+  const titulo = document.getElementById("titulo-estacion");
+  if (titulo) {
+    titulo.textContent = `Estación: ${estacion}`;
+  }
+
   const ctx = canvas.getContext("2d");
   const data = unificarFechas(dataRaw);
 
@@ -235,7 +315,7 @@ function graficar(dataRaw, estacion) {
       plugins: {
         legend: {
           display: true,
-          position: 'chartArea' // clave
+          position: 'chartArea'
         }
       },
 
