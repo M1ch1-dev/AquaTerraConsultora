@@ -68,9 +68,16 @@
   <div class="panel">
   <h2>Análisis</h2>
   <div class="grafico-panel">
+    <h3 id="titulo-estacion"></h3>
     <canvas id="grafico"></canvas>
   </div>
   <div id="estadisticos"></div>
+</div>
+  <div class="descarga-panel">
+  <button onclick="descargarDatos('base')">Descargar SENAMHI</button>
+  <button onclick="descargarDatos('imerg')">Descargar IMERG</button>
+  <button onclick="descargarDatos('chirps')">Descargar CHIRPS</button>
+  <button onclick="descargarDatos('all')">Descargar Todo</button>
 </div>
 
 </section>
