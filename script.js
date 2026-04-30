@@ -268,53 +268,54 @@ const legendTopRightPlugin = {
   id: 'legendTopRight',
 
   afterDraw(chart) {
-    const legend = chart.legend;
-    if (!legend) return;
-
-    const { ctx, chartArea } = chart;
+    const { ctx, data, chartArea } = chart;
+    if (!chartArea) return;
 
     const padding = 10;
+    const lineHeight = 14;
 
-    // 🔥 Forzar tamaño real (NO ocupar todo el alto)
-    const legendHeight = legend.legendItems.length * 14 + 10;
+    const labels = data.datasets.map(ds => ds.label);
+    const colors = data.datasets.map(ds => ds.borderColor || "#000");
 
-    const x = chartArea.right - legend.width - padding;
+    const boxSize = 10;
+
+    const width = 120; // ancho fijo limpio
+    const height = labels.length * lineHeight + 20;
+
+    const x = chartArea.right - width - padding;
     const y = chartArea.top + padding;
-
-    legend.top = y;
-    legend.left = x;
 
     ctx.save();
 
-    const boxPadding = 6;
-
-    // Fondo compacto
+    // Fondo
     ctx.fillStyle = "rgba(255,255,255,0.85)";
     ctx.strokeStyle = "#000";
     ctx.lineWidth = 1;
 
-    ctx.fillRect(
-      x - boxPadding,
-      y - boxPadding - 12,
-      legend.width + boxPadding * 2,
-      legendHeight + boxPadding * 2
-    );
+    ctx.fillRect(x, y, width, height);
+    ctx.strokeRect(x, y, width, height);
 
-    ctx.strokeRect(
-      x - boxPadding,
-      y - boxPadding - 12,
-      legend.width + boxPadding * 2,
-      legendHeight + boxPadding * 2
-    );
-
-    // Título "Leyenda:"
+    // Título
     ctx.fillStyle = "#000";
     ctx.font = "12px Arial";
-    ctx.fillText("Leyenda:", x, y - 2);
+    ctx.fillText("Leyenda:", x + 5, y + 12);
+
+    // Items
+    ctx.font = "11px Arial";
+
+    labels.forEach((label, i) => {
+      const yPos = y + 20 + i * lineHeight;
+
+      // color box
+      ctx.fillStyle = colors[i];
+      ctx.fillRect(x + 5, yPos - 8, boxSize, boxSize);
+
+      // texto
+      ctx.fillStyle = "#000";
+      ctx.fillText(label, x + 20, yPos);
+    });
 
     ctx.restore();
-
-    legend.draw(ctx);
   }
 };
 
@@ -366,16 +367,7 @@ function graficar(dataRaw) {
           }
         },
         legend: {
-          display: true,
-          position: 'top',
-          labels: {
-            boxWidth: 10,
-            boxHeight: 10,
-            padding: 8,
-            font: {
-              size: 11
-            }
-          }
+          display: false,
         }
       },
 
