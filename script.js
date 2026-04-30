@@ -339,16 +339,7 @@ function graficar(dataRaw, estacion) {
         intersect: false
       },
       
-      plugins: {
-    title: {
-      display: true,
-      position: 'top'
-      text: `Serie de precipitación mensual - Estación ${estacion}`,
-      align: 'center',
-      font: {
-        size: 16
-      }
-    },
+      
     legend: {
       display: true,
       position: 'top'
