@@ -350,7 +350,8 @@ function graficar(dataRaw, estacion) {
           const label = this.getLabelForValue(value);
           return label.split("-")[0];
       }
-    },
+    }
+  },
 
     y: {
       title: {
@@ -361,7 +362,7 @@ function graficar(dataRaw, estacion) {
   }
       
     }
-  };
+  });
 }
 
 // =======================
