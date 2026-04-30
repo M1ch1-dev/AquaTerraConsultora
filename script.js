@@ -271,51 +271,37 @@ const legendTopRightPlugin = {
     const { ctx, data, chartArea } = chart;
     if (!chartArea) return;
 
-    const padding = 10;
     const lineHeight = 14;
+const padding = 8;
 
-    const labels = data.datasets.map(ds => ds.label);
-    const colors = data.datasets.map(ds => ds.borderColor || "#000");
+const height = labels.length * lineHeight + padding * 2;
+const width = 120;
 
-    const boxSize = 10;
+const x = chartArea.right - width - 10;
+const y = chartArea.top + 10;
 
-    const width = 120; // ancho fijo limpio
-    const height = labels.length * lineHeight + 20;
+ctx.save();
 
-    const x = chartArea.right - width - padding;
-    const y = chartArea.top + padding;
-    const startY = y + 10;
-    
-    ctx.save();
+// Fondo
+ctx.fillStyle = "rgba(255,255,255,0.85)";
+ctx.strokeStyle = "#000";
 
-    // Fondo
-    ctx.fillStyle = "rgba(255,255,255,0.85)";
-    ctx.strokeStyle = "#000";
-    ctx.lineWidth = 1;
+ctx.fillRect(x, y, width, height);
+ctx.strokeRect(x, y, width, height);
 
-    ctx.fillRect(x, y, width, height);
-    ctx.strokeRect(x, y, width, height);
-    
-    // Título
-    ctx.fillStyle = "#000";
-    ctx.font = "12px Arial";
+// Items (centrados dentro del box)
+labels.forEach((label, i) => {
+  const yPos = y + padding + i * lineHeight + 10;
 
-    // Items
-    ctx.font = "11px Arial";
+  ctx.fillStyle = colors[i];
+  ctx.fillRect(x + 8, yPos - 6, 10, 10);
 
-    labels.forEach((label, i) => {
-      const yPos = startY + i * lineHeight;
+  ctx.fillStyle = "#000";
+  ctx.font = "11px Arial";
+  ctx.fillText(label, x + 25, yPos + 2);
+});
 
-      // color box
-      ctx.fillStyle = colors[i];
-      ctx.fillRect(x + 5, yPos - 8, boxSize, boxSize);
-
-      // texto
-      ctx.fillStyle = "#000";
-      ctx.fillText(label, x + 20, yPos);
-    });
-
-    ctx.restore();
+ctx.restore();
   }
 };
 
@@ -364,7 +350,7 @@ function graficar(dataRaw) {
     borderColor: "#1f77b4",
     backgroundColor: "#1f77b4",
     pointBackgroundColor: "#1f77b4",
-    pointBorderColor: "#000",
+    pointBorderColor: "#1f77b4",
     pointRadius: 3,
     tension: 0.3
   },
@@ -374,7 +360,7 @@ function graficar(dataRaw) {
     borderColor: "#d62728",
     backgroundColor: "#d62728",
     pointBackgroundColor: "#d62728",
-    pointBorderColor: "#000",
+    pointBorderColor: "#d62728",
     pointRadius: 3,
     tension: 0.3
   },
@@ -384,7 +370,7 @@ function graficar(dataRaw) {
     borderColor: "#2ca02c",
     backgroundColor: "#2ca02c",
     pointBackgroundColor: "#2ca02c",
-    pointBorderColor: "#000",
+    pointBorderColor: "#2ca02c",
     pointRadius: 3,
     tension: 0.3
   }
@@ -406,7 +392,7 @@ function graficar(dataRaw) {
           align: 'center',
           font: {
                   size: 16,
-                  weight: 'bold'
+                  weight: '800'
                 },
           padding: {
             top: 10,
