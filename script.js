@@ -285,6 +285,27 @@ function unificarFechas(data) {
 // =======================
 // GRAFICAR
 // =======================
+const legendTopRightPlugin = {
+  id: 'legendTopRight',
+
+  afterDraw(chart) {
+    const { ctx, chartArea } = chart;
+    const legend = chart.legend;
+
+    if (!legend) return;
+
+    const padding = 10;
+
+    const x = chartArea.right - legend.width - padding;
+    const y = chartArea.top + padding;
+
+    legend.top = y;
+    legend.left = x;
+
+    legend.draw(ctx);
+  }
+};
+
 let chart;
 
 function graficar(dataRaw, estacion) {
@@ -313,6 +334,7 @@ function graficar(dataRaw, estacion) {
         { label: "CHIRPS", data: data.chirps }
       ]
     },
+    plugins: [legendTopRightPlugin],
     options: {
       responsive: true,
       maintainAspectRatio: false,
