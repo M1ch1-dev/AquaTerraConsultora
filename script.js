@@ -326,6 +326,7 @@ function graficar(dataRaw, estacion) {
     title: {
       display: true,
       text: `Serie de precipitación mensual - Estación ${estacion}`,
+      align: 'center',
       font: {
         size: 16
       }
@@ -344,7 +345,10 @@ function graficar(dataRaw, estacion) {
       },
       ticks: {
         autoSkip: true,
-        maxTicksLimit: 4
+        maxTicksLimit: 10,
+        callback: function(value, index, ticks){
+          const label = this.getLabelForValue(value);
+          return label.split("-")[0];
       }
     },
 
