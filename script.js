@@ -15,10 +15,7 @@ function toggleMenu() {
   if (!menu) return;
 
   menu.classList.toggle("show");
-
-  if (arrow) {
-    arrow.classList.toggle("rotate");
-  }
+  if (arrow) arrow.classList.toggle("rotate");
 }
 
 // =======================
@@ -28,7 +25,7 @@ let datosActuales = null;
 let estacionActual = null;
 
 // =======================
-// INICIO GENERAL
+// INICIO
 // =======================
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -43,83 +40,9 @@ document.addEventListener("DOMContentLoaded", () => {
       attribution: '&copy; OpenStreetMap'
     }).addTo(map);
 
-    // =========================
-    // ZOOM PERSONALIZADO
-    // =========================
-    const ZoomControl = L.Control.extend({
-      options: { position: 'topright' },
-
-      onAdd: function () {
-        const container = L.DomUtil.create('div', 'custom-zoom-control');
-
-        const zoomIn = L.DomUtil.create('button', 'zoom-btn', container);
-        zoomIn.innerHTML = '+';
-
-        const slider = L.DomUtil.create('input', 'zoom-slider', container);
-        slider.type = 'range';
-        slider.min = map.getMinZoom();
-        slider.max = map.getMaxZoom();
-        slider.value = map.getZoom();
-
-        const zoomOut = L.DomUtil.create('button', 'zoom-btn', container);
-        zoomOut.innerHTML = '−';
-
-        L.DomEvent.disableClickPropagation(container);
-
-        zoomIn.onclick = () => map.zoomIn();
-        zoomOut.onclick = () => map.zoomOut();
-        slider.oninput = (e) => map.setZoom(parseInt(e.target.value));
-
-        map.on('zoomend', () => {
-          slider.value = map.getZoom();
-        });
-
-        return container;
-      }
-    });
-
-    map.addControl(new ZoomControl());
-
-    // =========================
-    // CAPAS
-    // =========================
     const estacionesLayer = L.layerGroup().addTo(map);
-    const riosLayer = L.layerGroup();
-    const departamentosLayer = L.layerGroup();
-
-    const capasControl = L.control.layers(null, {
-      "Estaciones": estacionesLayer,
-      "Ríos": riosLayer,
-      "Departamentos": departamentosLayer
-    }, { position: 'topright' }).addTo(map);
-
-    const container = capasControl.getContainer();
-    container.addEventListener('mouseenter', () => {
-      container.classList.add('leaflet-control-layers-expanded');
-    });
-    container.addEventListener('mouseleave', () => {
-      container.classList.remove('leaflet-control-layers-expanded');
-    });
 
     cargarEstaciones(estacionesLayer);
-
-    fetch('json/Mapa_limites.geojson')
-      .then(res => res.json())
-      .then(data => {
-        const geo = L.geoJSON(data, {
-          style: { color: "#403f3f", weight: 0.8, fillOpacity: 0 }
-        });
-        geo.eachLayer(layer => departamentosLayer.addLayer(layer));
-      });
-
-    fetch('json/bol_rios1m.geojson')
-      .then(res => res.json())
-      .then(data => {
-        const geo = L.geoJSON(data, {
-          style: { color: "#00b4d8", weight: 1.5 }
-        });
-        geo.eachLayer(layer => riosLayer.addLayer(layer));
-      });
 
   } else {
     cargarEstaciones(null);
@@ -165,7 +88,7 @@ async function cargarEstaciones(estacionesLayer) {
 }
 
 // =======================
-// RENDER ESTACIONES
+// LISTA
 // =======================
 function renderizarEstaciones(estaciones) {
   const contenedor = document.getElementById("lista-estaciones");
@@ -205,16 +128,13 @@ document.addEventListener("change", (e) => {
 });
 
 // =======================
-// ACTUALIZAR ANALISIS
+// ACTUALIZAR
 // =======================
 async function actualizarAnalisis() {
   const checks = document.querySelectorAll("#lista-estaciones input:checked");
   if (checks.length === 0) return;
 
   const estacion = checks[0].value;
-
-  const loader = document.getElementById("loader");
-  if (loader) loader.classList.remove("hidden");
 
   try {
     const res = await fetch(`${API_URL}/data/${encodeURIComponent(estacion)}`);
@@ -223,24 +143,16 @@ async function actualizarAnalisis() {
     datosActuales = data;
     estacionActual = estacion;
 
-    // 👉 TÍTULO FUERA DEL GRÁFICO
-    const tituloPrincipal = document.getElementById("titulo-principal");
-    if (tituloPrincipal) {
-      tituloPrincipal.textContent = `Serie de precipitación mensual - ${estacion}`;
-    }
-
     graficar(data);
     calcularEstadisticos(data);
 
   } catch (err) {
     console.error(err);
-  } finally {
-    if (loader) loader.classList.add("hidden");
   }
 }
 
 // =======================
-// UNIFICAR FECHAS
+// UNIFICAR
 // =======================
 function unificarFechas(data) {
   const keys = new Set([
@@ -262,49 +174,55 @@ function unificarFechas(data) {
 }
 
 // =======================
-// PLUGIN LEYENDA ESTILIZADA
+// PLUGIN LEYENDA
 // =======================
 const legendTopRightPlugin = {
   id: 'legendTopRight',
 
   afterDraw(chart) {
-    const { ctx, data, chartArea } = chart;
+    const { ctx, chartArea } = chart;
+    const datasets = chart.data.datasets;
+
     if (!chartArea) return;
 
+    const labels = datasets.map(d => d.label);
+    const colors = datasets.map(d => d.borderColor);
+
+    const padding = 8;
     const lineHeight = 14;
-const padding = 8;
 
-const height = labels.length * lineHeight + padding * 2;
-const width = 120;
+    const width = 120;
+    const height = labels.length * lineHeight + padding * 2;
 
-const x = chartArea.right - width - 10;
-const y = chartArea.top + 10;
+    const x = chartArea.right - width - 10;
+    const y = chartArea.top + 10;
 
-ctx.save();
+    ctx.save();
 
-// Fondo
-ctx.fillStyle = "rgba(255,255,255,0.85)";
-ctx.strokeStyle = "#000";
+    ctx.fillStyle = "rgba(255,255,255,0.85)";
+    ctx.strokeStyle = "#000";
 
-ctx.fillRect(x, y, width, height);
-ctx.strokeRect(x, y, width, height);
+    ctx.fillRect(x, y, width, height);
+    ctx.strokeRect(x, y, width, height);
 
-// Items (centrados dentro del box)
-labels.forEach((label, i) => {
-  const yPos = y + padding + i * lineHeight + 10;
+    labels.forEach((label, i) => {
+      const yPos = y + padding + i * lineHeight + 8;
 
-  ctx.fillStyle = colors[i];
-  ctx.fillRect(x + 8, yPos - 6, 10, 10);
+      ctx.fillStyle = colors[i];
+      ctx.fillRect(x + 8, yPos - 6, 10, 10);
 
-  ctx.fillStyle = "#000";
-  ctx.font = "11px Arial";
-  ctx.fillText(label, x + 25, yPos + 2);
-});
+      ctx.fillStyle = "#000";
+      ctx.font = "11px Arial";
+      ctx.fillText(label, x + 25, yPos);
+    });
 
-ctx.restore();
+    ctx.restore();
   }
 };
 
+// =======================
+// BORDE AREA
+// =======================
 const chartAreaBorder = {
   id: 'chartAreaBorder',
   afterDraw(chart) {
@@ -312,15 +230,12 @@ const chartAreaBorder = {
 
     ctx.save();
     ctx.strokeStyle = "#000";
-    ctx.lineWidth = 1;
-
     ctx.strokeRect(
       chartArea.left,
       chartArea.top,
       chartArea.right - chartArea.left,
       chartArea.bottom - chartArea.top
     );
-
     ctx.restore();
   }
 };
@@ -344,85 +259,59 @@ function graficar(dataRaw) {
     data: {
       labels: data.labels,
       datasets: [
-  {
-    label: "SENAMHI",
-    data: data.base,
-    borderColor: "#1f77b4",
-    backgroundColor: "#1f77b4",
-    pointBackgroundColor: "#1f77b4",
-    pointBorderColor: "#1f77b4",
-    pointRadius: 3,
-    tension: 0.3
-  },
-  {
-    label: "IMERG",
-    data: data.imerg,
-    borderColor: "#d62728",
-    backgroundColor: "#d62728",
-    pointBackgroundColor: "#d62728",
-    pointBorderColor: "#d62728",
-    pointRadius: 3,
-    tension: 0.3
-  },
-  {
-    label: "CHIRPS",
-    data: data.chirps,
-    borderColor: "#2ca02c",
-    backgroundColor: "#2ca02c",
-    pointBackgroundColor: "#2ca02c",
-    pointBorderColor: "#2ca02c",
-    pointRadius: 3,
-    tension: 0.3
-  }
-]
+        {
+          label: "SENAMHI",
+          data: data.base,
+          borderColor: "#1f77b4",
+          backgroundColor: "#1f77b4",
+          pointBackgroundColor: "#1f77b4",
+          pointBorderColor: "#1f77b4",
+          pointRadius: 3,
+          tension: 0.3
+        },
+        {
+          label: "IMERG",
+          data: data.imerg,
+          borderColor: "#d62728",
+          backgroundColor: "#d62728",
+          pointBackgroundColor: "#d62728",
+          pointBorderColor: "#d62728",
+          pointRadius: 3,
+          tension: 0.3
+        },
+        {
+          label: "CHIRPS",
+          data: data.chirps,
+          borderColor: "#2ca02c",
+          backgroundColor: "#2ca02c",
+          pointBackgroundColor: "#2ca02c",
+          pointBorderColor: "#2ca02c",
+          pointRadius: 3,
+          tension: 0.3
+        }
+      ]
     },
     plugins: [legendTopRightPlugin, chartAreaBorder],
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      interaction: {
-        mode: 'index',
-        intersect: false
-      },
 
       plugins: {
         title: {
           display: true,
           text: `Serie de precipitación mensual estación: ${estacionActual}`,
-          align: 'center',
-          font: {
-                  size: 16,
-                  weight: '800'
-                },
-          padding: {
-            top: 10,
-            bottom: 10
-          }
+          font: { size: 16, weight: 'bold' }
         },
-        legend: {
-          display: false,
-        }
+        legend: { display: false }
       },
 
       scales: {
         x: {
-          title: {
-            display: true,
-            text: "Años"
-          },
           ticks: {
-            autoSkip: true,
-            maxTicksLimit: 10,
             callback: function(value) {
               const label = this.getLabelForValue(value);
               return label.split("-")[0];
             }
-          }
-        },
-        y: {
-          title: {
-            display: true,
-            text: "Precipitación mensual [mm]"
           }
         }
       }
@@ -431,7 +320,7 @@ function graficar(dataRaw) {
 }
 
 // =======================
-// NASH
+// MÉTRICAS
 // =======================
 function nash(obs, sim) {
   const mean = obs.reduce((a,b)=>a+b,0) / obs.length;
@@ -441,7 +330,6 @@ function nash(obs, sim) {
     num += (obs[i] - sim[i]) ** 2;
     den += (obs[i] - mean) ** 2;
   }
-
   return 1 - num/den;
 }
 
@@ -485,53 +373,10 @@ function calcularEstadisticos(dataRaw) {
   const r2I = r2(data.base, data.imerg);
   const r2C = r2(data.base, data.chirps);
 
-
   el.innerHTML = `
-    <p><strong>Nash IMERG:</strong> ${nashI.toFixed(3)}</p>
-    <p><strong>Nash CHIRPS:</strong> ${nashC.toFixed(3)}</p>
-    <p><strong>RMSE IMERG:</strong> ${rmseI.toFixed(2)}</p>
-    <p><strong>RMSE CHIRPS:</strong> ${rmseC.toFixed(2)}</p>
-    <p><strong>R² IMERG:</strong> ${r2I.toFixed(3)}</p>
-    <p><strong>R² CHIRPS:</strong> ${r2C.toFixed(3)}</p>
+    <p><strong>Métricas:</strong></p>
+    <p>Nash → IMERG: ${nashI.toFixed(3)} | CHIRPS: ${nashC.toFixed(3)}</p>
+    <p>RMSE → IMERG: ${rmseI.toFixed(2)} | CHIRPS: ${rmseC.toFixed(2)}</p>
+    <p>R² → IMERG: ${r2I.toFixed(3)} | CHIRPS: ${r2C.toFixed(3)}</p>
   `;
-}
-
-// =======================
-// DESCARGA DATOS
-// =======================
-function descargarDatos(tipo) {
-  if (!datosActuales) {
-    alert("Primero selecciona una estación");
-    return;
-  }
-
-  const data = unificarFechas(datosActuales);
-
-  let contenido = "fecha";
-
-  if (tipo === "base" || tipo === "all") contenido += ",SENAMHI";
-  if (tipo === "imerg" || tipo === "all") contenido += ",IMERG";
-  if (tipo === "chirps" || tipo === "all") contenido += ",CHIRPS";
-
-  contenido += "\n";
-
-  for (let i = 0; i < data.labels.length; i++) {
-    let fila = data.labels[i];
-
-    if (tipo === "base" || tipo === "all") fila += `,${data.base[i]}`;
-    if (tipo === "imerg" || tipo === "all") fila += `,${data.imerg[i]}`;
-    if (tipo === "chirps" || tipo === "all") fila += `,${data.chirps[i]}`;
-
-    contenido += fila + "\n";
-  }
-
-  const blob = new Blob([contenido], { type: "text/csv;charset=utf-8;" });
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `datos_${estacionActual}_${tipo}.csv`;
-  a.click();
-
-  URL.revokeObjectURL(url);
 }
