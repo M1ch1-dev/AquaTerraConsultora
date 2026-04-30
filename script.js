@@ -237,10 +237,6 @@ async function actualizarAnalisis() {
 
   const estacion = checks[0].value;
 
-  if (titulo) {
-    titulo.textContent = `Estación: ${estacion}`;
-  }
-
   const loader = document.getElementById("loader");
   if (loader) loader.classList.remove("hidden");
 
