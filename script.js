@@ -272,36 +272,45 @@ const legendTopRightPlugin = {
     if (!legend) return;
 
     const { ctx, chartArea } = chart;
+
     const padding = 10;
 
-    legend.top = chartArea.top + padding;
-    legend.left = chartArea.right - legend.width - padding;
+    // 🔥 Forzar tamaño real (NO ocupar todo el alto)
+    const legendHeight = legend.legendItems.length * 14 + 10;
+
+    const x = chartArea.right - legend.width - padding;
+    const y = chartArea.top + padding;
+
+    legend.top = y;
+    legend.left = x;
 
     ctx.save();
 
-    const boxPadding = 8;
+    const boxPadding = 6;
 
-    ctx.fillStyle = "rgba(255,255,255,0.8)";
+    // Fondo compacto
+    ctx.fillStyle = "rgba(255,255,255,0.85)";
     ctx.strokeStyle = "#000";
     ctx.lineWidth = 1;
 
     ctx.fillRect(
-      legend.left - boxPadding,
-      legend.top - boxPadding - 14,
+      x - boxPadding,
+      y - boxPadding - 12,
       legend.width + boxPadding * 2,
-      legend.height + boxPadding * 2 + 14
+      legendHeight + boxPadding * 2
     );
 
     ctx.strokeRect(
-      legend.left - boxPadding,
-      legend.top - boxPadding - 14,
+      x - boxPadding,
+      y - boxPadding - 12,
       legend.width + boxPadding * 2,
-      legend.height + boxPadding * 2 + 14
+      legendHeight + boxPadding * 2
     );
 
+    // Título "Leyenda:"
     ctx.fillStyle = "#000";
     ctx.font = "12px Arial";
-    ctx.fillText("Leyenda:", legend.left, legend.top - 4);
+    ctx.fillText("Leyenda:", x, y - 2);
 
     ctx.restore();
 
@@ -343,9 +352,22 @@ function graficar(dataRaw) {
       },
 
       plugins: {
+        title: {
+          display: true,
+          text: `Serie de precipitación mensual estación: ${estacionActual}`,
+          align: 'center',
+          font: {
+                  size: 16,
+                  weight: 'bold'
+                },
+          padding: {
+            top: 10,
+            bottom: 10
+          }
+        },
         legend: {
           display: true,
-          position: 'chartArea',
+          position: 'top',
           labels: {
             boxWidth: 10,
             boxHeight: 10,
