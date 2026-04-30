@@ -338,10 +338,22 @@ function graficar(dataRaw) {
     data: {
       labels: data.labels,
       datasets: [
-        { label: "SENAMHI", data: data.base },
-        { label: "IMERG", data: data.imerg },
-        { label: "CHIRPS", data: data.chirps }
-      ]
+  {
+    label: "SENAMHI",
+    data: data.base,
+    borderColor: "#1f77b4"
+  },
+  {
+    label: "IMERG",
+    data: data.imerg,
+    borderColor: "#d62728"
+  },
+  {
+    label: "CHIRPS",
+    data: data.chirps,
+    borderColor: "#2ca02c"
+  }
+]
     },
     plugins: [legendTopRightPlugin],
     options: {
