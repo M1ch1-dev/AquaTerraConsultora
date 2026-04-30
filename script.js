@@ -237,7 +237,6 @@ async function actualizarAnalisis() {
 
   const estacion = checks[0].value;
 
-  const titulo = document.getElementById("titulo-estacion");
   if (titulo) {
     titulo.textContent = `Estación: ${estacion}`;
   }
