@@ -284,7 +284,8 @@ const legendTopRightPlugin = {
 
     const x = chartArea.right - width - padding;
     const y = chartArea.top + padding;
-
+    const startY = y + 10;
+    
     ctx.save();
 
     // Fondo
@@ -294,17 +295,16 @@ const legendTopRightPlugin = {
 
     ctx.fillRect(x, y, width, height);
     ctx.strokeRect(x, y, width, height);
-
+    
     // Título
     ctx.fillStyle = "#000";
     ctx.font = "12px Arial";
-    ctx.fillText("Leyenda:", x + 5, y + 12);
 
     // Items
     ctx.font = "11px Arial";
 
     labels.forEach((label, i) => {
-      const yPos = y + 20 + i * lineHeight;
+      const yPos = startY + i * lineHeight;
 
       // color box
       ctx.fillStyle = colors[i];
@@ -314,6 +314,26 @@ const legendTopRightPlugin = {
       ctx.fillStyle = "#000";
       ctx.fillText(label, x + 20, yPos);
     });
+
+    ctx.restore();
+  }
+};
+
+const chartAreaBorder = {
+  id: 'chartAreaBorder',
+  afterDraw(chart) {
+    const { ctx, chartArea } = chart;
+
+    ctx.save();
+    ctx.strokeStyle = "#000";
+    ctx.lineWidth = 1;
+
+    ctx.strokeRect(
+      chartArea.left,
+      chartArea.top,
+      chartArea.right - chartArea.left,
+      chartArea.bottom - chartArea.top
+    );
 
     ctx.restore();
   }
@@ -341,21 +361,36 @@ function graficar(dataRaw) {
   {
     label: "SENAMHI",
     data: data.base,
-    borderColor: "#1f77b4"
+    borderColor: "#1f77b4",
+    backgroundColor: "#1f77b4",
+    pointBackgroundColor: "#1f77b4",
+    pointBorderColor: "#000",
+    pointRadius: 3,
+    tension: 0.3
   },
   {
     label: "IMERG",
     data: data.imerg,
-    borderColor: "#d62728"
+    borderColor: "#d62728",
+    backgroundColor: "#d62728",
+    pointBackgroundColor: "#d62728",
+    pointBorderColor: "#000",
+    pointRadius: 3,
+    tension: 0.3
   },
   {
     label: "CHIRPS",
     data: data.chirps,
-    borderColor: "#2ca02c"
+    borderColor: "#2ca02c",
+    backgroundColor: "#2ca02c",
+    pointBackgroundColor: "#2ca02c",
+    pointBorderColor: "#000",
+    pointRadius: 3,
+    tension: 0.3
   }
 ]
     },
-    plugins: [legendTopRightPlugin],
+    plugins: [legendTopRightPlugin, chartAreaBorder],
     options: {
       responsive: true,
       maintainAspectRatio: false,
