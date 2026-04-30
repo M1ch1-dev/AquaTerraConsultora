@@ -459,6 +459,28 @@ function nash(obs, sim) {
   return 1 - num/den;
 }
 
+function rmse(obs, sim) {
+  let sum = 0;
+  for (let i = 0; i < obs.length; i++) {
+    sum += (obs[i] - sim[i]) ** 2;
+  }
+  return Math.sqrt(sum / obs.length);
+}
+
+function r2(obs, sim) {
+  const meanObs = obs.reduce((a,b)=>a+b,0) / obs.length;
+
+  let ssTot = 0;
+  let ssRes = 0;
+
+  for (let i = 0; i < obs.length; i++) {
+    ssTot += (obs[i] - meanObs) ** 2;
+    ssRes += (obs[i] - sim[i]) ** 2;
+  }
+
+  return 1 - (ssRes / ssTot);
+}
+
 // =======================
 // ESTADISTICOS
 // =======================
@@ -471,9 +493,20 @@ function calcularEstadisticos(dataRaw) {
   const nashI = nash(data.base, data.imerg);
   const nashC = nash(data.base, data.chirps);
 
+  const rmseI = rmse(data.base, data.imerg);
+  const rmseC = rmse(data.base, data.chirps);
+
+  const r2I = r2(data.base, data.imerg);
+  const r2C = r2(data.base, data.chirps);
+
+
   el.innerHTML = `
     <p><strong>Nash IMERG:</strong> ${nashI.toFixed(3)}</p>
     <p><strong>Nash CHIRPS:</strong> ${nashC.toFixed(3)}</p>
+    <p><strong>RMSE IMERG:</strong> ${rmseI.toFixed(2)}</p>
+    <p><strong>RMSE CHIRPS:</strong> ${rmseC.toFixed(2)}</p>
+    <p><strong>R² IMERG:</strong> ${r2I.toFixed(3)}</p>
+    <p><strong>R² CHIRPS:</strong> ${r2C.toFixed(3)}</p>
   `;
 }
 
