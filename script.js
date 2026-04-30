@@ -223,7 +223,13 @@ async function actualizarAnalisis() {
     datosActuales = data;
     estacionActual = estacion;
 
-    graficar(data, estacion);
+    // 👉 TÍTULO FUERA DEL GRÁFICO
+    const tituloPrincipal = document.getElementById("titulo-principal");
+    if (tituloPrincipal) {
+      tituloPrincipal.textContent = `Serie de precipitación mensual - ${estacion}`;
+    }
+
+    graficar(data);
     calcularEstadisticos(data);
 
   } catch (err) {
@@ -256,10 +262,11 @@ function unificarFechas(data) {
 }
 
 // =======================
-// PLUGIN LEYENDA TOP RIGHT
+// PLUGIN LEYENDA ESTILIZADA
 // =======================
 const legendTopRightPlugin = {
   id: 'legendTopRight',
+
   afterDraw(chart) {
     const legend = chart.legend;
     if (!legend) return;
@@ -270,6 +277,34 @@ const legendTopRightPlugin = {
     legend.top = chartArea.top + padding;
     legend.left = chartArea.right - legend.width - padding;
 
+    ctx.save();
+
+    const boxPadding = 8;
+
+    ctx.fillStyle = "rgba(255,255,255,0.8)";
+    ctx.strokeStyle = "#000";
+    ctx.lineWidth = 1;
+
+    ctx.fillRect(
+      legend.left - boxPadding,
+      legend.top - boxPadding - 14,
+      legend.width + boxPadding * 2,
+      legend.height + boxPadding * 2 + 14
+    );
+
+    ctx.strokeRect(
+      legend.left - boxPadding,
+      legend.top - boxPadding - 14,
+      legend.width + boxPadding * 2,
+      legend.height + boxPadding * 2 + 14
+    );
+
+    ctx.fillStyle = "#000";
+    ctx.font = "12px Arial";
+    ctx.fillText("Leyenda:", legend.left, legend.top - 4);
+
+    ctx.restore();
+
     legend.draw(ctx);
   }
 };
@@ -279,14 +314,9 @@ const legendTopRightPlugin = {
 // =======================
 let chart;
 
-function graficar(dataRaw, estacion) {
+function graficar(dataRaw) {
   const canvas = document.getElementById("grafico");
   if (!canvas) return;
-
-  const titulo = document.getElementById("titulo-estacion");
-  if (titulo) {
-    titulo.textContent = `Estación: ${estacion}`;
-  }
 
   const ctx = canvas.getContext("2d");
   const data = unificarFechas(dataRaw);
@@ -315,7 +345,15 @@ function graficar(dataRaw, estacion) {
       plugins: {
         legend: {
           display: true,
-          position: 'chartArea'
+          position: 'chartArea',
+          labels: {
+            boxWidth: 10,
+            boxHeight: 10,
+            padding: 8,
+            font: {
+              size: 11
+            }
+          }
         }
       },
 
