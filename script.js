@@ -308,7 +308,7 @@ function graficar(dataRaw) {
       scales: {
         x: {
           title: {
-            display: 'true',
+            display: true,
             text: "Años"            
           },
           ticks: {
@@ -323,27 +323,29 @@ function graficar(dataRaw) {
               
                return "";
             }
+          },
+          grid: {
+            display: true,
+            borderDash: [5, 5],
+            color: "rgba(0,0,0,0.2)"
           }
         },
         y: {
-      title: {
-        display: true,
-        text: "Precipitación mensual [mm]"
-      },
-
-      beginAtZero: true,   // 👈 AQUÍ VA
-
-      ticks: {
-        stepSize: 100
-      },
-
-      grid: {
-        display: true,
-        borderDash: [5, 5],
-        color: "rgba(0,0,0,0.2)"
+          title: {
+            display: true,
+            text: "Precipitación mensual [mm]"
+          },
+          beginAtZero: true,   
+          ticks: {
+            stepSize: 100
+          },
+          grid: {
+            display: true,
+            borderDash: [5, 5],
+            color: "rgba(0,0,0,0.2)"
+          }
+        }
       }
-    }
-  }
       }
     }
   });
