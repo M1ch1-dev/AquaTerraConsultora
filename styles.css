@@ -752,6 +752,7 @@ footer {
 
 /* CENTRO → porcentajes */
 .stats-center {
-  width: 50%;
-  text-align: center; /* 👈 centrado real */
+  width: 25%;
+  text-align: center;
+  align-items: center;
 }
