@@ -307,13 +307,43 @@ function graficar(dataRaw) {
 
       scales: {
         x: {
+          title: {
+            display: 'true',
+            text: "Años"            
+          },
           ticks: {
-            callback: function(value) {
+            autoSkip: false,
+            callback: function(value, index) {
               const label = this.getLabelForValue(value);
-              return label.split("-")[0];
+              const [year, month] = label.split("-");
+              
+              if (month === "01" && parseInt(year) % 2 === 0) {
+              return year;
+              }
+              
+               return "";
             }
           }
-        }
+        },
+        : {
+      title: {
+        display: true,
+        text: "Precipitación mensual [mm]"
+      },
+
+      beginAtZero: true,   // 👈 AQUÍ VA
+
+      ticks: {
+        stepSize: 100
+      },
+
+      grid: {
+        display: true,
+        borderDash: [5, 5],
+        color: "rgba(0,0,0,0.2)"
+      }
+    }
+  }
       }
     }
   });
