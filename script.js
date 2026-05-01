@@ -346,6 +346,18 @@ function graficar(dataRaw) {
           ticks: {
             stepSize: 100
           },
+          suggestedMax: function(context) {
+              const datasets = context.chart.data.datasets;
+          
+              let max = 0;
+          
+              datasets.forEach(ds => {
+                const localMax = Math.max(...ds.data);
+                if (localMax > max) max = localMax;
+              });
+          
+              return max + 100; 
+            },
           grid: {
             display: true,
             borderDash: [6, 4],
