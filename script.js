@@ -300,8 +300,11 @@ function graficar(dataRaw) {
           backgroundColor: "#1f77b4",
           pointBackgroundColor: "#1f77b4",
           pointBorderColor: "#1f77b4",
-          pointRadius: 3,
-          tension: 0.3
+          pointBorderWidth: 0,
+          pointRadius: 2,
+          pointHoverRadius: 3,
+          borderWidth: 1.5,
+          tension: 0.2
         },
         {
           label: "IMERG",
@@ -310,8 +313,11 @@ function graficar(dataRaw) {
           backgroundColor: "#d62728",
           pointBackgroundColor: "#d62728",
           pointBorderColor: "#d62728",
-          pointRadius: 3,
-          tension: 0.3
+          pointBorderWidth: 0,
+          pointRadius: 2,
+          pointHoverRadius: 3,
+          borderWidth: 1.5,
+          tension: 0.2
         },
         {
           label: "CHIRPS",
@@ -320,8 +326,11 @@ function graficar(dataRaw) {
           backgroundColor: "#2ca02c",
           pointBackgroundColor: "#2ca02c",
           pointBorderColor: "#2ca02c",
-          pointRadius: 3,
-          tension: 0.3
+          pointBorderWidth: 0,
+          pointRadius: 2,
+          pointHoverRadius: 3,
+          borderWidth: 1.5,
+          tension: 0.2
         }
       ]
     },
@@ -485,12 +494,11 @@ function calcularEstadisticos(dataRaw) {
       <h3>Métricas:</h3>
 
       <p><strong>Nash IMERG:</strong> ${nashI.toFixed(3)} |
-         <strong>R² IMERG:</strong> ${r2I.toFixed(3)}</p>
+         <strong>R² IMERG:</strong> ${r2I.toFixed(3)} | 
+         <strong>RMSE IMERG:</strong> ${rmseI.toFixed(2)}</p>
 
       <p><strong>Nash CHIRPS:</strong> ${nashC.toFixed(3)} |
-         <strong>R² CHIRPS:</strong> ${r2C.toFixed(3)}</p>
-
-      <p><strong>RMSE IMERG:</strong> ${rmseI.toFixed(2)} |
+         <strong>R² CHIRPS:</strong> ${r2C.toFixed(3)} |
          <strong>RMSE CHIRPS:</strong> ${rmseC.toFixed(2)}</p>
     </div>
 
