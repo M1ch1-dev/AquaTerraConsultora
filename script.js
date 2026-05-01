@@ -327,7 +327,7 @@ function graficar(dataRaw) {
           grid: {
             display: true,
             borderDash: [6, 4],
-            color: "rgba(0,0,0,0.2)"
+            color: "rgba(0,0,0,0.2)",
             // solo en enero cada 2 años
             lineWidth: function(ctx) {
               const label = ctx.chart.data.labels[ctx.index];
