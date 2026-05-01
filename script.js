@@ -326,8 +326,15 @@ function graficar(dataRaw) {
           },
           grid: {
             display: true,
-            borderDash: [5, 5],
+            borderDash: [6, 4],
             color: "rgba(0,0,0,0.2)"
+            // solo en enero cada 2 años
+            lineWidth: function(ctx) {
+              const label = ctx.chart.data.labels[ctx.index];
+              const [year, month] = label.split("-");
+      
+              return (month === "01" && parseInt(year) % 2 === 0) ? 1.5 : 0;
+            }
           }
         },
         y: {
@@ -341,7 +348,7 @@ function graficar(dataRaw) {
           },
           grid: {
             display: true,
-            borderDash: [5, 5],
+            borderDash: [6, 4],
             color: "rgba(0,0,0,0.2)"
           }
         }
