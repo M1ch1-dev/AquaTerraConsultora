@@ -325,7 +325,7 @@ function graficar(dataRaw) {
             }
           }
         },
-        : {
+        y: {
       title: {
         display: true,
         text: "Precipitación mensual [mm]"
