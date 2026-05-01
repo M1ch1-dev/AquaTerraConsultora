@@ -17,7 +17,11 @@ function toggleMenu() {
   menu.classList.toggle("show");
   if (arrow) arrow.classList.toggle("rotate");
 }
-
+// =======================
+// ANIMACION CARGANDO
+// =======================
+let intervaloLoader = null;
+let puntos = 1;
 // =======================
 // ESTADO GLOBAL
 // =======================
@@ -378,7 +382,6 @@ function graficar(dataRaw) {
     }
   });
 }
-
 // =======================
 // MÉTRICAS
 // =======================
