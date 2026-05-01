@@ -309,10 +309,16 @@ function graficar(dataRaw) {
         x: {
           title: {
             display: true,
-            text: "Años"            
+            text: "Años",
+            font: {
+              size: 12,
+              weight: 'bold' 
+            }
           },
           ticks: {
             autoSkip: false,
+            maxRotation: 0,   
+            minRotation: 0,
             callback: function(value, index) {
               const label = this.getLabelForValue(value);
               const [year, month] = label.split("-");
@@ -340,7 +346,11 @@ function graficar(dataRaw) {
         y: {
           title: {
             display: true,
-            text: "Precipitación mensual [mm]"
+            text: "Precipitación mensual [mm]",
+            font: {
+              size: 12,
+              weight: 'bold'
+            }
           },
           beginAtZero: true,   
           ticks: {
@@ -405,6 +415,16 @@ function r2(obs, sim) {
   return 1 - (ssRes / ssTot);
 }
 
+function porcentajeDatos(serie) {
+  const total = serie.length;
+
+  const validos = serie.filter(v =>
+    v !== null && v !== undefined && !isNaN(v)
+  ).length;
+
+  return (validos / total) * 100;
+}
+
 // =======================
 // ESTADISTICOS
 // =======================
@@ -423,10 +443,31 @@ function calcularEstadisticos(dataRaw) {
   const r2I = r2(data.base, data.imerg);
   const r2C = r2(data.base, data.chirps);
 
+  const pBase = porcentajeDatos(data.base);
+
   el.innerHTML = `
-    <p><strong>Métricas:</strong></p>
-    <p>Nash → IMERG: ${nashI.toFixed(3)} | CHIRPS: ${nashC.toFixed(3)}</p>
-    <p>RMSE → IMERG: ${rmseI.toFixed(2)} | CHIRPS: ${rmseC.toFixed(2)}</p>
-    <p>R² → IMERG: ${r2I.toFixed(3)} | CHIRPS: ${r2C.toFixed(3)}</p>
-  `;
+  <div class="stats-container">
+
+    <div class="stats-left">
+      <h3>Métricas:</h3>
+
+      <p><strong>Nash IMERG:</strong> ${nashI.toFixed(3)} |
+         <strong>R² IMERG:</strong> ${r2I.toFixed(3)}</p>
+
+      <p><strong>Nash CHIRPS:</strong> ${nashC.toFixed(3)} |
+         <strong>R² CHIRPS:</strong> ${r2C.toFixed(3)}</p>
+
+      <p><strong>RMSE IMERG:</strong> ${rmseI.toFixed(2)} |
+         <strong>RMSE CHIRPS:</strong> ${rmseC.toFixed(2)}</p>
+    </div>
+
+    <div class="stats-center">
+      <h3>Porcentaje de días con datos:</h3>
+      <p><strong>SENAMHI:</strong> ${pBase.toFixed(1)}%</p>
+      <p><strong>IMERG:</strong> ${pImerg.toFixed(1)}%</p>
+      <p><strong>CHIRPS:</strong> ${pChirps.toFixed(1)}%</p>
+    </div>
+
+  </div>
+`;
 }
