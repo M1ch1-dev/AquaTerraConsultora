@@ -464,8 +464,6 @@ function calcularEstadisticos(dataRaw) {
     <div class="stats-center">
       <h3>Porcentaje de días con datos:</h3>
       <p><strong>SENAMHI:</strong> ${pBase.toFixed(1)}%</p>
-      <p><strong>IMERG:</strong> ${pImerg.toFixed(1)}%</p>
-      <p><strong>CHIRPS:</strong> ${pChirps.toFixed(1)}%</p>
     </div>
 
   </div>
