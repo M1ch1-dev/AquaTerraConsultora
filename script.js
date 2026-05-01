@@ -346,7 +346,6 @@ function graficar(dataRaw) {
           }
         }
       }
-      }
     }
   });
 }
