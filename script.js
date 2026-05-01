@@ -22,6 +22,23 @@ function toggleMenu() {
 // =======================
 let intervaloLoader = null;
 let puntos = 1;
+function iniciarLoader() {
+  const texto = document.getElementById("texto-loader");
+  if (!texto) return;
+
+  puntos = 1;
+
+  intervaloLoader = setInterval(() => {
+    puntos++;
+    if (puntos > 4) puntos = 1;
+
+    texto.textContent = "Cargando datos" + ".".repeat(puntos);
+  }, 400);
+}
+
+function detenerLoader() {
+  clearInterval(intervaloLoader);
+}
 // =======================
 // ESTADO GLOBAL
 // =======================
@@ -140,6 +157,13 @@ async function actualizarAnalisis() {
 
   const estacion = checks[0].value;
 
+  const loader = document.getElementById("loader");
+
+  if (loader) {
+    loader.classList.remove("hidden");
+    iniciarLoader();
+  }
+
   try {
     const res = await fetch(`${API_URL}/data/${encodeURIComponent(estacion)}`);
     const data = await res.json();
@@ -152,6 +176,12 @@ async function actualizarAnalisis() {
 
   } catch (err) {
     console.error(err);
+  } finally {
+
+    if (loader) {
+      loader.classList.add("hidden");
+      detenerLoader();
+    }
   }
 }
 
