@@ -467,6 +467,27 @@ function porcentajeDatos(serie) {
   return (validos / total) * 100;
 }
 
+function obtenerRangoFechasReales(dataBase) {
+  const fechas = Object.keys(dataBase)
+    .filter(f => dataBase[f] !== null && !isNaN(dataBase[f]))
+    .sort();
+
+  if (fechas.length === 0) {
+    return { inicio: "-", fin: "-" };
+  }
+
+  return {
+    inicio: fechas[0],
+    fin: fechas[fechas.length - 1]
+  };
+}
+function formatearFecha(fecha) {
+  if (!fecha) return "-";
+
+  const [y, m, d] = fecha.split("-");
+  return `${d}/${m}/${y}`;
+}
+
 // =======================
 // ESTADISTICOS
 // =======================
@@ -475,6 +496,7 @@ function calcularEstadisticos(dataRaw) {
   if (!el) return;
 
   const data = unificarFechas(dataRaw);
+  const { inicio, fin } = obtenerRangoFechasReales(dataRaw.base);
 
   const nashI = nash(data.base, data.imerg);
   const nashC = nash(data.base, data.chirps);
@@ -505,6 +527,8 @@ function calcularEstadisticos(dataRaw) {
     <div class="stats-center">
       <h3>Porcentaje de días con datos:</h3>
       <p><strong>SENAMHI:</strong> ${pBase.toFixed(1)}%</p>
+      <p><strong>Fecha inicio:</strong> ${formatearFecha(inicio)}</p>
+      <p><strong>Fecha final:</strong> ${formatearFecha(fin)}</p>
     </div>
 
   </div>
