@@ -44,6 +44,7 @@ function detenerLoader() {
 // =======================
 let datosActuales = null;
 let estacionActual = null;
+let modoGrafico = "mensual"; // "mensual" | "max"
 
 // =======================
 // INICIO
@@ -230,6 +231,33 @@ function agruparMensualFrontend(dataDiario) {
   };
 }
 
+function agruparMaximoMensual(dataDiario) {
+  const agrupar = (serie) => {
+    const out = {};
+
+    Object.entries(serie).forEach(([fecha, valor]) => {
+      if (valor === null || isNaN(valor)) return;
+
+      const [y, m] = fecha.split("-");
+      const key = `${y}-${m}`;
+
+      if (!(key in out)) {
+        out[key] = valor;
+      } else {
+        out[key] = Math.max(out[key], valor);
+      }
+    });
+
+    return out;
+  };
+
+  return {
+    base: agrupar(dataDiario.base),
+    imerg: agrupar(dataDiario.imerg),
+    chirps: agrupar(dataDiario.chirps)
+  };
+}
+
 // =======================
 // PLUGIN LEYENDA
 // =======================
@@ -307,8 +335,15 @@ function graficar(dataRaw) {
   if (!canvas) return;
 
   const ctx = canvas.getContext("2d");
-  const dataMensual = agruparMensualFrontend(dataRaw);
-  const data = unificarFechas(dataMensual);
+  
+  let dataProcesada;
+  if (modoGrafico === "mensual") {
+    dataProcesada = agruparMensualFrontend(dataRaw);
+  } else {
+    dataProcesada = agruparMaximoMensual(dataRaw);
+  }
+  
+  const data = unificarFechas(dataProcesada);
 
   if (chart) chart.destroy();
 
@@ -366,7 +401,9 @@ function graficar(dataRaw) {
       plugins: {
         title: {
           display: true,
-          text: `Serie de precipitación mensual estación: ${estacionActual}`,
+          text: modoGrafico === "mensual"
+            ? `Serie de precipitación mensual estación: ${estacionActual}`
+            : `Análisis de máximos diarios mensuales - Estación: ${estacionActual}`,
           font: { size: 16, weight: 'bold' }
         },
         legend: { display: false }
@@ -519,8 +556,16 @@ function calcularEstadisticos(dataRaw) {
   const el = document.getElementById("estadisticos");
   if (!el) return;
 
-  const dataMensual = agruparMensualFrontend(dataRaw);
-  const data = unificarFechas(dataMensual);
+  let dataProcesada;
+
+  if (modoGrafico === "mensual") {
+    dataProcesada = agruparMensualFrontend(dataRaw);
+  } else {
+    dataProcesada = agruparMaximoMensual(dataRaw);
+  }
+
+  const data = unificarFechas(dataProcesada);
+
   const { inicio, fin } = obtenerRangoFechasReales(dataRaw.base);
 
   const nashI = nash(data.base, data.imerg);
@@ -532,7 +577,7 @@ function calcularEstadisticos(dataRaw) {
   const r2I = r2(data.base, data.imerg);
   const r2C = r2(data.base, data.chirps);
 
-  const pBase = porcentajeDatos(data.base);
+  const pBase = porcentajeDatos(Object.values(dataRaw.base));
 
   el.innerHTML = `
   <div class="stats-container">
@@ -550,7 +595,7 @@ function calcularEstadisticos(dataRaw) {
     </div>
 
     <div class="stats-center">
-      <h3>Porcentaje de días con datos:</h3>
+      <h3>Porcentaje de meses con datos:</h3>
       <p><strong>SENAMHI:</strong> ${pBase.toFixed(1)}%</p>
       <p><strong>Fecha inicio:</strong> ${formatearFecha(inicio)}</p>
       <p><strong>Fecha final:</strong> ${formatearFecha(fin)}</p>
