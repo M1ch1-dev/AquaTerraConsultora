@@ -7,48 +7,132 @@ const csv = require("csv-parser");
 const app = express();
 app.use(cors());
 
+// =======================
+// READ CSV
+// =======================
 function readCSV(filePath) {
   return new Promise((resolve) => {
-    const out = [];
-    if (!fs.existsSync(filePath)) return resolve(out);
+    const rows = [];
+
+    if (!fs.existsSync(filePath)) return resolve({});
 
     fs.createReadStream(filePath)
       .pipe(csv())
       .on("data", (row) => {
-        // 👇 ajusta a tus columnas reales
-        const fecha = new Date(row.date || row.fecha);
-        const valor = parseFloat(row.tp || row.precip);
+        const fechaRaw = row.date || row.fecha;
+        const valorRaw = row.tp || row.precip || row.Pr;
 
-        if (!isNaN(fecha) && !isNaN(valor)) {
-          out.push({ fecha, valor });
+        const fecha = new Date(fechaRaw);
+        if (isNaN(fecha)) return;
+
+        let valor = null;
+
+        // Diferenciar 0 de missing
+        if (valorRaw !== undefined && valorRaw !== "") {
+          const parsed = parseFloat(valorRaw);
+          valor = isNaN(parsed) ? null : parsed;
         }
+
+        rows.push({ fecha, valor });
       })
-      .on("end", () => resolve(out));
+      .on("end", () => {
+
+        // =========================
+        // SERIE DIARIA
+        // =========================
+        const serie = {};
+
+        rows.forEach(d => {
+          const key = d.fecha.toISOString().split("T")[0];
+          serie[key] = d.valor; // puede ser 0 o null
+        });
+
+        // =========================
+        // COMPLETAR FECHAS
+        // =========================
+        const fechas = Object.keys(serie).sort();
+
+        if (fechas.length === 0) {
+          return resolve(serie);
+        }
+
+        const inicio = new Date(fechas[0]);
+        const fin = new Date(fechas[fechas.length - 1]);
+
+        const resultado = {};
+
+        for (
+          let d = new Date(inicio);
+          d <= fin;
+          d.setDate(d.getDate() + 1)
+        ) {
+          const key = d.toISOString().split("T")[0];
+          resultado[key] = serie[key] ?? null;
+        }
+
+        resolve(resultado);
+      });
   });
 }
 
-function agruparMensual(data) {
-  const out = {};
-  data.forEach(d => {
-    const key = `${d.fecha.getFullYear()}-${String(d.fecha.getMonth()+1).padStart(2,'0')}`;
-    out[key] = (out[key] || 0) + d.valor;
+// =======================
+// AGRUPAR MENSUAL
+// =======================
+function agruparMensual(serieDiaria) {
+  const mensual = {};
+
+  Object.entries(serieDiaria).forEach(([fecha, valor]) => {
+    if (valor === null) return;
+
+    const [y, m] = fecha.split("-");
+    const key = `${y}-${m}`;
+
+    if (!mensual[key]) mensual[key] = 0;
+    mensual[key] += valor;
   });
-  return out;
+
+  return mensual;
 }
 
+// =======================
+// ENDPOINT
+// =======================
 app.get("/data/:est", async (req, res) => {
   const est = req.params.est;
 
-  const base = await readCSV(path.join(__dirname, "Data/Senamhi/Precip", `${est}.csv`));
-  const imerg = await readCSV(path.join(__dirname, "Data/IMERG/Precip", `${est}.csv`));
-  const chirps = await readCSV(path.join(__dirname, "Data/CHIRPS/Precip", `${est}.csv`));
+  try {
+    const base = await readCSV(
+      path.join(__dirname, "Data/Senamhi/Precip", `${est}.csv`)
+    );
 
-  res.json({
-    base: agruparMensual(base),
-    imerg: agruparMensual(imerg),
-    chirps: agruparMensual(chirps)
-  });
+    const imerg = await readCSV(
+      path.join(__dirname, "Data/IMERG/Precip", `${est}.csv`)
+    );
+
+    const chirps = await readCSV(
+      path.join(__dirname, "Data/CHIRPS/Precip", `${est}.csv`)
+    );
+
+    res.json({
+      base,
+      imerg,
+      chirps,
+
+      base_mensual: agruparMensual(base),
+      imerg_mensual: agruparMensual(imerg),
+      chirps_mensual: agruparMensual(chirps)
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error leyendo datos" });
+  }
 });
 
+// =======================
+// START SERVER
+// =======================
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log("Servidor en puerto", PORT));
+app.listen(PORT, () => {
+  console.log("Servidor en puerto", PORT);
+});
