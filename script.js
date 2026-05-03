@@ -172,6 +172,40 @@ async function cargarEstaciones(estacionesLayer) {
   renderizarEstaciones(estaciones);
 }
 
+const ZoomControl = L.Control.extend({
+  options: { position: 'topright' },
+
+  onAdd: function () {
+    const container = L.DomUtil.create('div', 'custom-zoom-control');
+
+    const zoomIn = L.DomUtil.create('button', 'zoom-btn', container);
+    zoomIn.innerHTML = '+';
+
+    const slider = L.DomUtil.create('input', 'zoom-slider', container);
+    slider.type = 'range';
+    slider.min = map.getMinZoom();
+    slider.max = map.getMaxZoom();
+    slider.value = map.getZoom();
+
+    const zoomOut = L.DomUtil.create('button', 'zoom-btn', container);
+    zoomOut.innerHTML = '−';
+
+    L.DomEvent.disableClickPropagation(container);
+
+    zoomIn.onclick = () => map.zoomIn();
+    zoomOut.onclick = () => map.zoomOut();
+    slider.oninput = (e) => map.setZoom(parseInt(e.target.value));
+
+    map.on('zoomend', () => {
+      slider.value = map.getZoom();
+    });
+
+    return container;
+  }
+});
+
+map.addControl(new ZoomControl());
+
 // =======================
 // LISTA
 // =======================
