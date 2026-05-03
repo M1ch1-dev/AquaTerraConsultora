@@ -555,11 +555,16 @@ function obtenerRangoFechasReales(dataBase) {
     fin: fechas[fechas.length - 1]
   };
 }
-function formatearFecha(fecha) {
+function formatearFecha(fecha, modo) {
   if (!fecha) return "-";
 
   const [y, m, d] = fecha.split("-");
-  return `${m}/${y}`;
+
+  if (modo === "mensual") {
+    return `${m}/${y}`;
+  } else {
+    return `${d}/${m}/${y}`;
+  }
 }
 
 // =======================
@@ -590,7 +595,18 @@ function calcularEstadisticos(dataRaw) {
   const r2I = r2(data.base, data.imerg);
   const r2C = r2(data.base, data.chirps);
 
-  const pBase = porcentajeDatos(Object.values(dataRaw.base));
+  const tituloPorcentaje = modoGrafico === "mensual"
+  ? "Porcentaje de meses con datos:"
+  : "Porcentaje de días con datos:";
+
+  let pBase;
+
+  if (modoGrafico === "mensual") {
+    const mensual = agruparMensualFrontend(dataRaw).base;
+    pBase = porcentajeDatos(Object.values(mensual));
+  } else {
+    pBase = porcentajeDatos(Object.values(dataRaw.base));
+  }
 
   el.innerHTML = `
   <div class="stats-container">
@@ -608,10 +624,10 @@ function calcularEstadisticos(dataRaw) {
     </div>
 
     <div class="stats-center">
-      <h3>Porcentaje de meses con datos:</h3>
+      <h3>${tituloPorcentaje}</h3>
       <p><strong>SENAMHI:</strong> ${pBase.toFixed(1)}%</p>
-      <p><strong>Fecha inicio:</strong> ${formatearFecha(inicio)}</p>
-      <p><strong>Fecha final:</strong> ${formatearFecha(fin)}</p>
+      <p><strong>Fecha inicio:</strong> ${formatearFecha(inicio, modoGrafico)}</p>
+      <p><strong>Fecha final:</strong> ${formatearFecha(fin, modoGrafico)}</p>
     </div>
 
   </div>
