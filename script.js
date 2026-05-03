@@ -51,6 +51,19 @@ let modoGrafico = "mensual"; // "mensual" | "max"
 // =======================
 document.addEventListener("DOMContentLoaded", () => {
 
+  const toggle = document.getElementById("toggleModo");
+
+  if (toggle) {
+    toggle.addEventListener("change", () => {
+      modoGrafico = toggle.checked ? "max" : "mensual";
+  
+      if (datosActuales) {
+        graficar(datosActuales);
+        calcularEstadisticos(datosActuales);
+      }
+    });
+  }
+  
   const mapContainer = document.getElementById("map");
 
   if (mapContainer) {
