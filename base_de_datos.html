@@ -62,26 +62,32 @@
   <div id="loader" class="loader hidden">
   <p id="texto-loader">Cargando datos.</p>
   </div>
-
-  <div class="toggle-container">
-  <span>Acumulado mensual</span>
-
-  <label class="switch">
-    <input type="checkbox" id="toggleModo">
-    <span class="slider"></span>
-  </label>
-
-  <span>Máximo diario por mes</span>
-  </div>
   
   <!-- GRÁFICA -->
   <div class="panel">
-  <h2>Análisis</h2>
+
+  <div class="panel-header">
+    <h2>Análisis</h2>
+
+    <div class="toggle-container">
+      <span>Acumulado mensual</span>
+
+      <label class="switch">
+        <input type="checkbox" id="toggleModo">
+        <span class="slider"></span>
+      </label>
+
+      <span>Máximo diario por mes</span>
+    </div>
+  </div>
+
   <div class="grafico-panel">
     <h3 id="titulo-estacion"></h3>
     <canvas id="grafico"></canvas>
   </div>
+
   <div id="estadisticos"></div>
+
 </div>
   <div class="descarga-panel">
   <button onclick="descargarDatos('base')">Descargar SENAMHI</button>
