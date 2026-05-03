@@ -45,6 +45,7 @@ function detenerLoader() {
 let datosActuales = null;
 let estacionActual = null;
 let modoGrafico = "mensual"; // "mensual" | "max"
+let map;
 
 const ZoomControl = L.Control.extend({
   options: { position: 'topright' },
@@ -101,14 +102,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (mapContainer) {
 
-    const map = L.map('map', { zoomControl: false })
+  map = L.map('map', { zoomControl: false })
   .setView([-16.5, -64.5], 5);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '&copy; OpenStreetMap'
 }).addTo(map);
     
-map.addControl(new ZoomControl());
+map.addControl(new ZoomControl());    
 
 // =========================
 // CAPAS
