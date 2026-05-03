@@ -207,6 +207,29 @@ function unificarFechas(data) {
   };
 }
 
+function agruparMensualFrontend(dataDiario) {
+  const agrupar = (serie) => {
+    const out = {};
+
+    Object.entries(serie).forEach(([fecha, valor]) => {
+      if (valor === null || isNaN(valor)) return;
+
+      const [y, m] = fecha.split("-");
+      const key = `${y}-${m}`;
+
+      out[key] = (out[key] || 0) + valor;
+    });
+
+    return out;
+  };
+
+  return {
+    base: agrupar(dataDiario.base),
+    imerg: agrupar(dataDiario.imerg),
+    chirps: agrupar(dataDiario.chirps)
+  };
+}
+
 // =======================
 // PLUGIN LEYENDA
 // =======================
@@ -284,7 +307,8 @@ function graficar(dataRaw) {
   if (!canvas) return;
 
   const ctx = canvas.getContext("2d");
-  const data = unificarFechas(dataRaw);
+  const dataMensual = agruparMensualFrontend(dataRaw);
+  const data = unificarFechas(dataMensual);
 
   if (chart) chart.destroy();
 
@@ -485,7 +509,7 @@ function formatearFecha(fecha) {
   if (!fecha) return "-";
 
   const [y, m, d] = fecha.split("-");
-  return `${d}/${m}/${y}`;
+  return `${m}/${y}`;
 }
 
 // =======================
@@ -495,7 +519,8 @@ function calcularEstadisticos(dataRaw) {
   const el = document.getElementById("estadisticos");
   if (!el) return;
 
-  const data = unificarFechas(dataRaw);
+  const dataMensual = agruparMensualFrontend(dataRaw);
+  const data = unificarFechas(dataMensual);
   const { inicio, fin } = obtenerRangoFechasReales(dataRaw.base);
 
   const nashI = nash(data.base, data.imerg);
