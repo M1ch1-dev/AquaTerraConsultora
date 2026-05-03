@@ -757,12 +757,16 @@ footer {
   align-items: left;
 }
 
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .toggle-container {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-bottom: 10px;
+  gap: 8px;
   font-size: 12px;
 }
 
