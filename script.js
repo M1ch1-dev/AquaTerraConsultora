@@ -69,15 +69,65 @@ document.addEventListener("DOMContentLoaded", () => {
   if (mapContainer) {
 
     const map = L.map('map', { zoomControl: false })
-      .setView([-16.5, -64.5], 5);
+  .setView([-16.5, -64.5], 5);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap'
-    }).addTo(map);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; OpenStreetMap'
+}).addTo(map);
 
-    const estacionesLayer = L.layerGroup().addTo(map);
+// =========================
+// CAPAS
+// =========================
+const estacionesLayer = L.layerGroup().addTo(map);
+const riosLayer = L.layerGroup();
+const departamentosLayer = L.layerGroup();
 
-    cargarEstaciones(estacionesLayer);
+// Control de capas (botón)
+const capasControl = L.control.layers(null, {
+  "Estaciones": estacionesLayer,
+  "Ríos": riosLayer,
+  "Departamentos": departamentosLayer
+}, { position: 'topright' }).addTo(map);
+
+// Hover automático (como tenías antes)
+const container = capasControl.getContainer();
+container.addEventListener('mouseenter', () => {
+  container.classList.add('leaflet-control-layers-expanded');
+});
+container.addEventListener('mouseleave', () => {
+  container.classList.remove('leaflet-control-layers-expanded');
+});
+
+// =========================
+// CARGAR ESTACIONES
+// =========================
+cargarEstaciones(estacionesLayer);
+
+// =========================
+// GEOJSON - DEPARTAMENTOS
+// =========================
+fetch('json/Mapa_limites.geojson')
+  .then(res => res.json())
+  .then(data => {
+    const geo = L.geoJSON(data, {
+      style: { color: "#403f3f", weight: 0.8, fillOpacity: 0 }
+    });
+    geo.eachLayer(layer => departamentosLayer.addLayer(layer));
+  })
+  .catch(err => console.error("Error departamentos:", err));
+
+// =========================
+// GEOJSON - RÍOS
+// =========================
+fetch('json/bol_rios1m.geojson')
+  .then(res => res.json())
+  .then(data => {
+    const geo = L.geoJSON(data, {
+      style: { color: "#00b4d8", weight: 1.5 }
+    });
+    geo.eachLayer(layer => riosLayer.addLayer(layer));
+  })
+  .catch(err => console.error("Error ríos:", err));
 
   } else {
     cargarEstaciones(null);
