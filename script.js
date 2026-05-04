@@ -952,43 +952,48 @@ function renderSeleccionadas() {
 }
 
 async function actualizarGraficoMulti() {
-
   if (estacionesSeleccionadas.length === 0) return;
 
   const loader = document.getElementById("multi-loader");
-
   if (loader) {
     loader.classList.remove("hidden");
     iniciarLoaderMulti();
   }
 
   try {
-
     const series = [];
 
     for (const estacion of estacionesSeleccionadas) {
-
       const res = await fetch(`${API_URL}/data/${encodeURIComponent(estacion)}`);
-      const data = await res.json();
+      const dataRaw = await res.json();
 
-      let serie;
+      let dataProcesada;
 
-      if (modoGraficoMulti  === "mensual") {
-        serie = agruparMensualFrontend(data)[datasetSeleccionado];
+      // ========================================================
+      // LOGICA DE PROCESAMIENTO (Igual al Panel 1)
+      // ========================================================
+      if (modoGraficoMulti === "mensual") {
+        // Suma de todos los días del mes
+        dataProcesada = agruparMensualFrontend(dataRaw);
+      } else if (modoGraficoMulti === "max") {
+        // Buscamos el valor más alto de cada mes
+        dataProcesada = agruparMaximoMensual(dataRaw);
       } else {
-        serie = data[datasetSeleccionado];
+        // Si tienes una opción de "diario puro", la dejamos aquí
+        dataProcesada = dataRaw;
       }
+
+      // Extraemos solo el dataset seleccionado (base, imerg o chirps)
+      const serieFinal = dataProcesada[datasetSeleccionado];
 
       series.push({
         nombre: estacion,
-        data: serie
+        data: serieFinal
       });
     }
 
     const dataFinal = unificarMultiEstaciones(series);
-
     graficarMulti(dataFinal);
-
 
     const metricas = calcularMetricasMulti(dataFinal);
     renderMetricasMulti(metricas);
@@ -996,7 +1001,6 @@ async function actualizarGraficoMulti() {
   } catch (err) {
     console.error("Error en multi análisis:", err);
   } finally {
-
     if (loader) {
       loader.classList.add("hidden");
       detenerLoaderMulti();
