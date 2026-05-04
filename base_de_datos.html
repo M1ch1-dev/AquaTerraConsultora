@@ -54,20 +54,31 @@
 <section class="panel-container">
 
   <!-- SELECCIÓN -->
-  <div class="panel">
-    <h2>Selección de estaciones</h2>
-    <div id="lista-estaciones" class="grid-estaciones"></div>
-  </div>
+  <div id="panel-filtros">
 
-  <div id="loader" class="loader hidden">
-  <p id="texto-loader">Cargando datos.</p>
+    <label for="select-depto"><strong>Elija departamento:</strong></label>
+    <select id="select-depto">
+      <option value="">-- Seleccione --</option>
+    </select>
+  
+    <label for="select-estacion" style="margin-top:10px;">
+      <strong>Elija estación:</strong>
+    </label>
+    <select id="select-estacion" disabled>
+      <option value="">-- Seleccione un departamento primero --</option>
+    </select>
+  
+    <div id="loader" class="hidden" style="margin-top:10px;">
+      <p id="texto-loader">Cargando datos.</p>
+    </div>
+  
   </div>
   
   <!-- GRÁFICA -->
   <div class="panel">
 
   <div class="panel-header">
-    <h2>Análisis</h2>
+    <h2>Análisis de 1 sola estación</h2>
 
     <div class="toggle-container">
       <span>Acumulado mensual</span>
