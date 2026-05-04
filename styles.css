@@ -933,31 +933,30 @@ input:checked + .slider:before {
   font-weight: bold;
 }
 
+/* AJUSTE PARA QUE EL MULTI SEA IGUAL AL PANEL 1 */
+
 .multi-filtros-grid {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
+/* Esta clase hará que las columnas se comporten como la ".fila" del Panel 1 */
 .multi-fila {
   display: flex;
   gap: 20px;
   align-items: flex-end;
 }
 
+/* Esta clase hará que cada select se comporte como el ".campo" del Panel 1 */
 .multi-campo {
   display: flex;
   flex-direction: column;
-  width: 30%;
+  width: 30%; /* Mismo ancho que definiste arriba para .campo */
 }
 
-.multi-col {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-/* Mantener selects elegantes y no gigantes */
-.multi-col select {
-  width: 100%;
+/* Reset de anchos para asegurar consistencia */
+.multi-fila .multi-campo {
+  flex: 1;
+  max-width: 30%;
 }
