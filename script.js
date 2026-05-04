@@ -46,6 +46,8 @@ let datosActuales = null;
 let estacionActual = null;
 let modoGrafico = "mensual"; // "mensual" | "max"
 let map;
+let estacionesSeleccionadas = [];
+let datasetSeleccionado = "base";
 
 const ZoomControl = L.Control.extend({
   options: { position: 'topright' },
@@ -795,4 +797,110 @@ function descargarDatos(tipo) {
   const nombreArchivo = `${estacionActual}_${modoGrafico}.xlsx`;
 
   XLSX.writeFile(wb, nombreArchivo);
+}
+
+document.getElementById("multi-dataset")
+  .addEventListener("change", (e) => {
+    datasetSeleccionado = e.target.value;
+    actualizarGraficoMulti();
+  });
+
+document.getElementById("multi-estacion")
+  .addEventListener("change", (e) => {
+
+    const est = e.target.value;
+    if (!est) return;
+
+    // evitar duplicados
+    if (!estacionesSeleccionadas.includes(est)) {
+      estacionesSeleccionadas.push(est);
+      renderSeleccionadas();
+      actualizarGraficoMulti();
+    }
+  });
+function renderSeleccionadas() {
+  const container = document.getElementById("multi-seleccionadas");
+  container.innerHTML = "";
+
+  estacionesSeleccionadas.forEach((est, i) => {
+
+    const chip = document.createElement("div");
+    chip.className = "chip";
+
+    chip.innerHTML = `
+      ${est}
+      <span data-index="${i}">✕</span>
+    `;
+
+    container.appendChild(chip);
+  });
+
+  // eliminar estación
+  container.querySelectorAll("span").forEach(el => {
+    el.addEventListener("click", (e) => {
+      const index = e.target.dataset.index;
+      estacionesSeleccionadas.splice(index, 1);
+
+      renderSeleccionadas();
+      actualizarGraficoMulti();
+    });
+  });
+}
+
+async function actualizarGraficoMulti() {
+
+  if (estacionesSeleccionadas.length === 0) return;
+
+  const datasets = [];
+
+  for (const estacion of estacionesSeleccionadas) {
+
+    const res = await fetch(`${API_URL}/data/${encodeURIComponent(estacion)}`);
+    const data = await res.json();
+
+    let serie;
+
+    if (modoGrafico === "mensual") {
+      serie = agruparMensualFrontend(data)[datasetSeleccionado];
+    } else {
+      serie = data[datasetSeleccionado];
+    }
+
+    const valores = Object.values(serie);
+
+    datasets.push({
+      label: estacion,
+      data: valores,
+      borderWidth: 1.5,
+      tension: 0.2
+    });
+  }
+
+  graficarMulti(datasets);
+}
+
+let chartMulti;
+
+function graficarMulti(datasets) {
+
+  const ctx = document.getElementById("grafico-multi").getContext("2d");
+
+  if (chartMulti) chartMulti.destroy();
+
+  chartMulti = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: datasets[0].data.map((_, i) => i), // simple index
+      datasets
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: `Comparación de estaciones (${datasetSeleccionado})`
+        }
+      }
+    }
+  });
 }
