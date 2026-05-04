@@ -9,12 +9,11 @@
 
   <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  
 </head>
 
 <body>
 
-<!-- HEADER (igual que tu index) -->
+<!-- HEADER -->
 <header class="header-container">
   <div class="header-left">
     <img src="Image/AQUATERRA-fondo.png" alt="Logo" class="logo">
@@ -51,76 +50,74 @@
   </div>
 </section>
 
+<!-- PANEL PRINCIPAL -->
 <section class="panel-container">
 
-  <!-- SELECCIÓN -->
-  <div id="panel-filtros">
-
-    <label for="select-depto"><strong>Elija departamento:</strong></label>
-    <select id="select-depto">
-      <option value="">-- Seleccione --</option>
-    </select>
-  
-    <label for="select-estacion" style="margin-top:10px;">
-      <strong>Elija estación:</strong>
-    </label>
-    <select id="select-estacion" disabled>
-      <option value="">-- Seleccione un departamento primero --</option>
-    </select>
-  
-    <div id="loader" class="hidden" style="margin-top:10px;">
-      <p id="texto-loader">Cargando datos.</p>
-    </div>
-  
-  </div>
-  
-  <!-- GRÁFICA -->
   <div id="panel-analisis" class="panel">
 
     <h2>Análisis</h2>
-  
+
+    <!-- ========================= -->
     <!-- FILTROS -->
+    <!-- ========================= -->
     <div class="panel-section">
-      <label>Elija departamento:</label>
-      <select id="select-depto"></select>
-  
-      <label>Elija estación:</label>
-      <select id="select-estacion" disabled></select>
+      
+      <label><strong>Elija departamento:</strong></label>
+      <select id="select-depto">
+        <option value="">-- Seleccione --</option>
+      </select>
+
+      <label style="margin-top:10px;">
+        <strong>Elija estación:</strong>
+      </label>
+      <select id="select-estacion" disabled>
+        <option value="">-- Seleccione un departamento primero --</option>
+      </select>
+
     </div>
-  
+
+    <!-- ========================= -->
     <!-- LOADER -->
+    <!-- ========================= -->
     <div id="loader" class="loader hidden">
       <span id="texto-loader">Cargando datos...</span>
     </div>
-  
-    <!-- METRICAS -->
+
+    <!-- ========================= -->
+    <!-- GRÁFICO -->
+    <!-- ========================= -->
+    <div class="panel-section">
+      <canvas id="grafico"></canvas>
+    </div>
+
+    <!-- ========================= -->
+    <!-- MÉTRICAS -->
+    <!-- ========================= -->
     <div id="estadisticos"></div>
-  
-    <!-- DESCARGAS -->
+
+    <!-- ========================= -->
+    <!-- DESCARGA -->
+    <!-- ========================= -->
     <div class="panel-section descargas">
       <h3>Descarga de datos</h3>
-  
+
       <button id="btn-descargar">
-        ☁ Descargar datos
+        <svg width="16" height="16" viewBox="0 0 24 24">
+          <path fill="white" d="M19 18H6a4 4 0 0 1-.4-7.98A6 6 0 0 1 18 9a5 5 0 0 1 1 9zm-7-2l4-4h-3V8h-2v4H8z"/>
+        </svg>
+        Descargar datos
       </button>
+
     </div>
-  
+
   </div>
-  
-  <div class="descarga-panel">
-  <button onclick="descargarDatos('base')">Descargar SENAMHI</button>
-  <button onclick="descargarDatos('imerg')">Descargar IMERG</button>
-  <button onclick="descargarDatos('chirps')">Descargar CHIRPS</button>
-  <button onclick="descargarDatos('all')">Descargar Todo</button>
-</div>
 
 </section>
 
 <!-- Scripts -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="script.js"></script>
+
 </body>
 </html>
