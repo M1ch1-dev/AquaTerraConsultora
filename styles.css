@@ -857,24 +857,31 @@ input:checked + .slider:before {
 
 .filtros-grid {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.fila {
+  display: flex;
   gap: 20px;
+  align-items: flex-end;
 }
 
-.filtros-left {
+.campo {
+  display: flex;
+  flex-direction: column;
+}
+
+/* tamaños exactos que pediste */
+.fila .campo:first-child {
   width: 30%;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
 }
 
-.filtros-right {
-  width: 40%;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
+.fila .campo:last-child {
+  width: 30%;
 }
 
-.filtros-right select {
-  width: 100%;
+/* estación también 30% */
+.fila:nth-child(2) .campo {
+  width: 30%;
 }
