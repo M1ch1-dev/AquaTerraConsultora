@@ -486,7 +486,7 @@ const legendTopRightPlugin = {
     const padding = 8;
     const lineHeight = 14;
 
-    const width = 120;
+    const width = 160;
     const height = labels.length * lineHeight + padding * 2;
 
     const x = chartArea.right - width - 10;
@@ -937,30 +937,53 @@ async function actualizarGraficoMulti() {
 
   if (estacionesSeleccionadas.length === 0) return;
 
-  const series = [];
+  const loader = document.getElementById("multi-loader");
 
-  for (const estacion of estacionesSeleccionadas) {
-
-    const res = await fetch(`${API_URL}/data/${encodeURIComponent(estacion)}`);
-    const data = await res.json();
-
-    let serie;
-
-    if (modoGrafico === "mensual") {
-      serie = agruparMensualFrontend(data)[datasetSeleccionado];
-    } else {
-      serie = data[datasetSeleccionado];
-    }
-
-    series.push({
-      nombre: estacion,
-      data: serie
-    });
+  if (loader) {
+    loader.classList.remove("hidden");
+    iniciarLoaderMulti();
   }
 
-  const dataFinal = unificarMultiEstaciones(series);
+  try {
 
-  graficarMulti(dataFinal);
+    const series = [];
+
+    for (const estacion of estacionesSeleccionadas) {
+
+      const res = await fetch(`${API_URL}/data/${encodeURIComponent(estacion)}`);
+      const data = await res.json();
+
+      let serie;
+
+      if (modoGrafico === "mensual") {
+        serie = agruparMensualFrontend(data)[datasetSeleccionado];
+      } else {
+        serie = data[datasetSeleccionado];
+      }
+
+      series.push({
+        nombre: estacion,
+        data: serie
+      });
+    }
+
+    const dataFinal = unificarMultiEstaciones(series);
+
+    graficarMulti(dataFinal);
+
+
+    const metricas = calcularMetricasMulti(dataFinal);
+    renderMetricasMulti(metricas);
+
+  } catch (err) {
+    console.error("Error en multi análisis:", err);
+  } finally {
+
+    if (loader) {
+      loader.classList.add("hidden");
+      detenerLoaderMulti();
+    }
+  }
 }
 
 let chartMulti;
