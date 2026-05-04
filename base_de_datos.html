@@ -59,25 +59,31 @@
 
     <!-- FILTROS -->
   <div class="panel-section filtros-grid">
-
-    <!-- IZQUIERDA -->
-    <div class="filtros-left">
-      <label>Elija departamento:</label>
-      <select id="select-depto"></select>
   
-      <label>Elija estación:</label>
-      <select id="select-estacion" disabled></select>
+    <!-- FILA 1 -->
+    <div class="fila">
+      <div class="campo">
+        <label>Elija departamento:</label>
+        <select id="select-depto"></select>
+      </div>
+  
+      <div class="campo">
+        <label>Elija tipo de análisis:</label>
+        <select id="select-modo">
+          <option value="mensual">Serie de acumulados mensuales</option>
+          <option value="max">Serie de máximos mensuales</option>
+        </select>
+      </div>
     </div>
   
-    <!-- DERECHA -->
-    <div class="filtros-right">
-      <label>Elija tipo de análisis:</label>
-      <select id="select-modo">
-        <option value="mensual">Serie de acumulados mensuales</option>
-        <option value="max">Serie de máximos mensuales</option>
-      </select>
+    <!-- FILA 2 -->
+    <div class="fila">
+      <div class="campo">
+        <label>Elija estación:</label>
+        <select id="select-estacion" disabled></select>
+      </div>
     </div>
-
+  
   </div>
 
     <!-- LOADER -->
