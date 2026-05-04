@@ -758,3 +758,24 @@ document.getElementById("btn-descargar").addEventListener("click", () => {
 
   descargarCSV(dataProcesada, estacionActual);
 });
+
+function descargarCSV(data, estacion) {
+
+  const fechas = Object.keys(data.base).sort();
+
+  let csv = "fecha,SENAMHI,IMERG,CHIRPS\n";
+
+  fechas.forEach(f => {
+    csv += `${f},${data.base[f] || 0},${data.imerg[f] || 0},${data.chirps[f] || 0}\n`;
+  });
+
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+
+  const tipo = modoGrafico === "mensual" ? "mensual" : "diario";
+
+  link.download = `${estacion}_${tipo}.csv`;
+  link.click();
+}
