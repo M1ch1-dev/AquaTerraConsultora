@@ -67,6 +67,7 @@ function detenerLoaderMulti() {
 let datosActuales = null;
 let estacionActual = null;
 let modoGrafico = "mensual"; // "mensual" | "max"
+let modoGraficoMulti = "mensual";
 let map;
 let estacionesSeleccionadas = [];
 let datasetSeleccionado = "base";
@@ -122,6 +123,13 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
+
+ if (multiModo) {
+  multiModo.addEventListener("change", (e) => {
+    modoGraficoMulti = e.target.value;
+    actualizarGraficoMulti();
+  });
+}
   
   const mapContainer = document.getElementById("map");
 
@@ -954,7 +962,7 @@ async function actualizarGraficoMulti() {
 
       let serie;
 
-      if (modoGrafico === "mensual") {
+      if (modoGraficoMulti  === "mensual") {
         serie = agruparMensualFrontend(data)[datasetSeleccionado];
       } else {
         serie = data[datasetSeleccionado];
@@ -1000,7 +1008,7 @@ function graficarMulti(data) {
       labels: data.labels,
       datasets: data.datasets
     },
-    plugins: [legendTopRightPlugin, chartAreaBorder], // 🔥 reutilizas
+    plugins: [legendTopRightPlugin, chartAreaBorder], 
     options: {
       responsive: true,
       maintainAspectRatio: false,
