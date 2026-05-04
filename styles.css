@@ -890,3 +890,45 @@ input:checked + .slider:before {
 .fila:nth-child(2) .campo {
   width: 30%;
 }
+
+.panel-row {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  width: 30%;
+}
+
+.seleccionadas-box {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  background: #f5f7fa;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+/* chips de estaciones */
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  background: #43648b;
+  color: white;
+
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+}
+
+.chip span {
+  cursor: pointer;
+  font-weight: bold;
+}
