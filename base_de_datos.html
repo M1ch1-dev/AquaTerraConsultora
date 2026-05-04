@@ -126,28 +126,36 @@
   <!-- FILA SUPERIOR -->
   <div class="panel-section multi-filtros-grid">
     <!-- COLUMNA IZQUIERDA -->
-    <div class="multi-col">
-      <label><strong>Elija departamento:</strong></label>
-      <select id="multi-depto"></select>
-  
-      <label><strong>Elija estación:</strong></label>
-      <select id="multi-estacion"></select>
+    <div class="multi-fila">
+      <div class="multi-campo">
+        <label><strong>Elija departamento:</strong></label>
+        <select id="multi-depto"></select>
+      </div>
+
+      <div class="multi-campo">
+        <label>Elija tipo de análisis:</label>
+        <select id="multi-modo">
+          <option value="mensual">Serie de acumulados mensuales</option>
+          <option value="max">Serie de máximos mensuales</option>
+        </select>
+      </div>
     </div>
 
-    <!-- COLUMNA DERECHA -->
-    <div class="multi-col">
-      <label>Elija tipo de análisis:</label>
-      <select id="multi-modo">
-        <option value="mensual">Serie de acumulados mensuales</option>
-        <option value="max">Serie de máximos mensuales</option>
-      </select>
-  
-      <label>Elija base de datos:</label>
-      <select id="multi-dataset">
-        <option value="base">SENAMHI</option>
-        <option value="imerg">IMERG</option>
-        <option value="chirps">CHIRPS</option>
-      </select>
+   <!-- FILA 2: Estación y Dataset -->
+    <div class="multi-fila">
+      <div class="multi-campo">
+        <label><strong>Elija estación:</strong></label>
+        <select id="multi-estacion"></select>
+      </div>
+
+      <div class="multi-campo">
+        <label>Elija base de datos:</label>
+        <select id="multi-dataset">
+          <option value="base">SENAMHI</option>
+          <option value="imerg">IMERG</option>
+          <option value="chirps">CHIRPS</option>
+        </select>
+      </div>
     </div>
   </div> <!-- Cierre correcto de multi-filtros-grid -->
 
