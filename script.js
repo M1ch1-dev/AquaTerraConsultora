@@ -706,7 +706,7 @@ function graficar(dataRaw) {
           },
           beginAtZero: true,   
           ticks: {
-            stepSize: 100
+            stepSize: 75
           },
           suggestedMax: function(context) {
               const datasets = context.chart.data.datasets;
@@ -1076,6 +1076,9 @@ function graficarMulti(data) {
             font: { size: 12, weight: 'bold' }
           },
           beginAtZero: true,
+          ticks: {
+            stepSize: 75
+          },
           suggestedMax: function(context) {
               const datasets = context.chart.data.datasets;
           
