@@ -66,21 +66,34 @@
     </div>
 
     <!-- FILTROS -->
-    <div class="panel-section">
-      
-      <label><strong>Elija departamento:</strong></label>
-      <select id="select-depto">
-        <option value="">-- Seleccione --</option>
-      </select>
+    <div class="panel-section filtros-grid">
 
-      <label style="margin-top:10px;">
-        <strong>Elija estación:</strong>
-      </label>
-      <select id="select-estacion" disabled>
-        <option value="">-- Seleccione un departamento primero --</option>
-      </select>
-
+  <!-- IZQUIERDA -->
+  <div class="filtros-left">
+      <label>Elija departamento:</label>
+      <select id="select-depto"></select>
+  
+      <label>Elija estación:</label>
+      <select id="select-estacion" disabled></select>
     </div>
+  
+    <!-- DERECHA -->
+    <div class="filtros-right">
+      <label>Elija tipo de análisis:</label>
+  
+      <div class="toggle-container">
+        <span>Mensual</span>
+  
+        <label class="switch">
+          <input type="checkbox" id="toggleModo">
+          <span class="slider"></span>
+        </label>
+  
+        <span>Máximos</span>
+      </div>
+    </div>
+  
+  </div>
 
     <!-- LOADER -->
     <div id="loader" class="loader hidden">
