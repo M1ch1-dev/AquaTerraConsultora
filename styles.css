@@ -828,11 +828,16 @@ input:checked + .slider:before {
   border: 1px solid #ccc;
 }
 
-.descargas button {
+.descargas-row {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.descargas-row button {
+  flex: 1;
+  min-width: 120px;
 
   padding: 8px;
   border: none;
@@ -841,11 +846,12 @@ input:checked + .slider:before {
   background: #43648b;
   color: white;
   cursor: pointer;
+  font-weight: 600;
 
-  font-weight: bold;
+  transition: 0.2s;
 }
 
-.descargas button:hover {
+.descargas-row button:hover {
   background: #2f4a6b;
 }
 
