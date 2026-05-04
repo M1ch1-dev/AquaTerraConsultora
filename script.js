@@ -698,7 +698,7 @@ function graficar(dataRaw) {
         y: {
           title: {
             display: true,
-            text: "Precipitación mensual [mm]",
+            text: "Precipitación [mm]",
             font: {
               size: 12,
               weight: 'bold'
@@ -1031,7 +1031,7 @@ function graficarMulti(data) {
       plugins: {
         title: {
           display: true,
-          text: `Comparación multi-estación (${datasetSeleccionado.toUpperCase()})`,
+          text: `Comparación gráfica multi-estaciones `,
           font: { size: 16, weight: 'bold' }
         },
         legend: { display: false }
