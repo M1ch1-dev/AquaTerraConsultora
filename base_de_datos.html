@@ -135,20 +135,34 @@
     </div>
   
     <!-- COLUMNA DERECHA -->
+   <div class="multi-grid">
+
+  <!-- COLUMNA IZQUIERDA -->
+  <div class="multi-col">
+    <label>Elija departamento:</label>
+    <select id="multi-depto"></select>
+
+    <label>Elija estación:</label>
+    <select id="multi-estacion"></select>
+  </div>
+
+  <!-- COLUMNA DERECHA -->
     <div class="multi-col">
-      <label><strong>Tipo de análisis:</strong></label>
+      <label>Elija tipo de análisis:</label>
       <select id="multi-modo">
         <option value="mensual">Serie de acumulados mensuales</option>
         <option value="max">Serie de máximos mensuales</option>
       </select>
   
-      <label><strong>Base de datos:</strong></label>
-      <select id="multi-base">
+      <label>Elija base de datos:</label>
+      <select id="multi-dataset">
         <option value="base">SENAMHI</option>
         <option value="imerg">IMERG</option>
         <option value="chirps">CHIRPS</option>
       </select>
     </div>
+
+</div>
   
   </div>
 
