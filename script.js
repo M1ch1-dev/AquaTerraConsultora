@@ -50,7 +50,7 @@ let map;
 const ZoomControl = L.Control.extend({
   options: { position: 'topright' },
 
-  onAdd: function (map) {   // 👈 aquí Leaflet te pasa el map correcto
+  onAdd: function (map) {   
     const container = L.DomUtil.create('div', 'custom-zoom-control');
 
     const zoomIn = L.DomUtil.create('button', 'zoom-btn', container);
@@ -212,32 +212,66 @@ async function cargarEstaciones(estacionesLayer) {
 // LISTA
 // =======================
 function renderizarEstaciones(estaciones) {
-  const contenedor = document.getElementById("lista-estaciones");
-  if (!contenedor) return;
 
-  contenedor.innerHTML = "";
+  const selectDepto = document.getElementById("select-depto");
+  const selectEst = document.getElementById("select-estacion");
 
+  if (!selectDepto || !selectEst) return;
+
+  // agrupar
   const grupos = {};
 
   estaciones.forEach(est => {
-    if (!grupos[est.departamento]) grupos[est.departamento] = [];
-    grupos[est.departamento].push(est);
+    if (!grupos[est.departamento]) {
+      grupos[est.departamento] = [];
+    }
+    grupos[est.departamento].push(est.nombre);
   });
 
-  Object.keys(grupos).forEach(depto => {
-    const div = document.createElement("div");
+  // llenar departamentos
+  selectDepto.innerHTML = `<option value="">-- Seleccione --</option>`;
 
-    const titulo = document.createElement("h3");
-    titulo.textContent = depto;
-    div.appendChild(titulo);
+  Object.keys(grupos).sort().forEach(depto => {
+    const opt = document.createElement("option");
+    opt.value = depto;
+    opt.textContent = depto;
+    selectDepto.appendChild(opt);
+  });
 
-    grupos[depto].forEach(est => {
-      const label = document.createElement("label");
-      label.innerHTML = `<input type="checkbox" value="${est.nombre}"> ${est.nombre}`;
-      div.appendChild(label);
+  // evento cambio departamento
+  selectDepto.addEventListener("change", () => {
+
+    const depto = selectDepto.value;
+
+    selectEst.innerHTML = "";
+
+    if (!depto) {
+      selectEst.disabled = true;
+      selectEst.innerHTML = `<option>-- Seleccione un departamento primero --</option>`;
+      return;
+    }
+
+    selectEst.disabled = false;
+
+    const estacionesDepto = grupos[depto];
+
+    selectEst.innerHTML = `<option value="">-- Seleccione --</option>`;
+
+    estacionesDepto.sort().forEach(nombre => {
+      const opt = document.createElement("option");
+      opt.value = nombre;
+      opt.textContent = nombre;
+      selectEst.appendChild(opt);
     });
 
-    contenedor.appendChild(div);
+  });
+
+  // evento cambio estación
+  selectEst.addEventListener("change", () => {
+    const estacion = selectEst.value;
+    if (!estacion) return;
+
+    actualizarAnalisis(estacion);
   });
 }
 
@@ -251,8 +285,8 @@ document.addEventListener("change", (e) => {
 // =======================
 // ACTUALIZAR
 // =======================
-async function actualizarAnalisis() {
-  const checks = document.querySelectorAll("#lista-estaciones input:checked");
+async function actualizarAnalisis(estacion) {
+
   if (checks.length === 0) return;
 
   const estacion = checks[0].value;
