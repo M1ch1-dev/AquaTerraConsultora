@@ -428,6 +428,11 @@ footer {
   padding: 40px 40px;
   background: #f5f7fa;
   max-width: 1400px;
+
+  margin-left: auto;
+  margin-right: auto;
+
+  border-radius: 12px;
 }
 
 .mapa-wrapper {
