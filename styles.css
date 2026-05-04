@@ -838,6 +838,7 @@ input:checked + .slider:before {
 .descargas-row button {
   flex: 0 0 30%;
   min-width: 120px;
+  max-width: 150px
 
   padding: 8px;
   border: none;
