@@ -932,3 +932,21 @@ input:checked + .slider:before {
   cursor: pointer;
   font-weight: bold;
 }
+
+.multi-filtros-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.multi-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Mantener selects elegantes y no gigantes */
+.multi-col select {
+  width: 80%;
+  max-width: 280px;
+}
