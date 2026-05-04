@@ -6,40 +6,105 @@ const API_URL = window.location.hostname === "127.0.0.1"
   : "https://aquaterraconsultora-api.onrender.com";
 
 // =======================
-// ESTADO GLOBAL
+// MENU
 // =======================
-let datosActuales = null;
-let estacionActual = null;
+function toggleMenu() {
+  const menu = document.getElementById("menu");
+  const arrow = document.getElementById("arrow");
 
-let modoGrafico = "mensual";
-let modoGraficoMulti = "mensual";
+  if (!menu) return;
 
-let estacionesSeleccionadas = [];
-let datasetSeleccionado = "base";
-
-let chart;
-let chartMulti;
-
+  menu.classList.toggle("show");
+  if (arrow) arrow.classList.toggle("rotate");
+}
 // =======================
-// LOADER
+// ANIMACION CARGANDO
 // =======================
 let intervaloLoader = null;
-let intervaloLoaderMulti = null;
-
-function iniciarLoader(idTexto) {
-  let puntos = 1;
-  const texto = document.getElementById(idTexto);
+let puntos = 1;
+function iniciarLoader() {
+  const texto = document.getElementById("texto-loader");
   if (!texto) return;
 
-  return setInterval(() => {
-    puntos = puntos >= 4 ? 1 : puntos + 1;
+  puntos = 1;
+
+  intervaloLoader = setInterval(() => {
+    puntos++;
+    if (puntos > 4) puntos = 1;
+
     texto.textContent = "Cargando datos" + ".".repeat(puntos);
   }, 400);
 }
 
-function detenerLoader(intervalo) {
-  clearInterval(intervalo);
+function detenerLoader() {
+  clearInterval(intervaloLoader);
 }
+
+let intervaloLoaderMulti = null;
+let puntosMulti = 1;
+
+function iniciarLoaderMulti() {
+  const texto = document.getElementById("multi-texto-loader");
+  if (!texto) return;
+
+  puntosMulti = 1;
+
+  intervaloLoaderMulti = setInterval(() => {
+    puntosMulti++;
+    if (puntosMulti > 4) puntosMulti = 1;
+
+    texto.textContent = "Cargando datos" + ".".repeat(puntosMulti);
+  }, 400);
+}
+
+function detenerLoaderMulti() {
+  clearInterval(intervaloLoaderMulti);
+}
+
+// =======================
+// ESTADO GLOBAL
+// =======================
+let datosActuales = null;
+let estacionActual = null;
+let modoGrafico = "mensual"; // "mensual" | "max"
+let modoGraficoMulti = "mensual";
+let map;
+let estacionesSeleccionadas = [];
+let datasetSeleccionado = "base";
+let chartMulti;
+
+const ZoomControl = L.Control.extend({
+  options: { position: 'topright' },
+
+  onAdd: function (map) {   
+    const container = L.DomUtil.create('div', 'custom-zoom-control');
+
+    const zoomIn = L.DomUtil.create('button', 'zoom-btn', container);
+    zoomIn.innerHTML = '+';
+
+    const slider = L.DomUtil.create('input', 'zoom-slider', container);
+    slider.type = 'range';
+    slider.min = map.getMinZoom();
+    slider.max = map.getMaxZoom();
+    slider.value = map.getZoom();
+
+    const zoomOut = L.DomUtil.create('button', 'zoom-btn', container);
+    zoomOut.innerHTML = '−';
+
+    L.DomEvent.disableClickPropagation(container);
+
+    zoomIn.onclick = () => map.zoomIn();
+    zoomOut.onclick = () => map.zoomOut();
+    slider.oninput = (e) => map.setZoom(parseInt(e.target.value));
+
+    map.on('zoomend', () => {
+      slider.value = map.getZoom();
+    });
+
+    return container;
+  }
+});
+
 
 // =======================
 // INICIO
@@ -47,14 +112,11 @@ function detenerLoader(intervalo) {
 document.addEventListener("DOMContentLoaded", () => {
 
   const selectModo = document.getElementById("select-modo");
-  const multiModo = document.getElementById("multi-modo");
-  const multiDataset = document.getElementById("multi-dataset");
 
-  // SINGLE
   if (selectModo) {
     selectModo.addEventListener("change", () => {
       modoGrafico = selectModo.value;
-
+  
       if (datosActuales) {
         graficar(datosActuales);
         calcularEstadisticos(datosActuales);
@@ -62,28 +124,148 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // MULTI
-  if (multiModo) {
-    multiModo.addEventListener("change", (e) => {
-      modoGraficoMulti = e.target.value;
-      actualizarGraficoMulti();
-    });
-  }
+ if (multiModo) {
+  multiModo.addEventListener("change", (e) => {
+    modoGraficoMulti = e.target.value;
+    actualizarGraficoMulti();
+  });
+}
+  
+  const mapContainer = document.getElementById("map");
 
-  if (multiDataset) {
-    multiDataset.addEventListener("change", (e) => {
-      datasetSeleccionado = e.target.value;
-      actualizarGraficoMulti();
-    });
-  }
+  if (mapContainer) {
 
-  cargarEstaciones();
+  map = L.map('map', { zoomControl: false })
+  .setView([-16.5, -64.5], 5);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; OpenStreetMap'
+}).addTo(map);
+    
+map.addControl(new ZoomControl());    
+
+// =========================
+// CAPAS
+// =========================
+const estacionesLayer = L.layerGroup().addTo(map);
+const riosLayer = L.layerGroup();
+const departamentosLayer = L.layerGroup();
+
+// Control de capas (botón)
+const capasControl = L.control.layers(null, {
+  "Estaciones": estacionesLayer,
+  "Ríos": riosLayer,
+  "Departamentos": departamentosLayer
+}, { position: 'topright' }).addTo(map);
+
+// Hover automático (como tenías antes)
+const container = capasControl.getContainer();
+container.addEventListener('mouseenter', () => {
+  container.classList.add('leaflet-control-layers-expanded');
 });
+container.addEventListener('mouseleave', () => {
+  container.classList.remove('leaflet-control-layers-expanded');
+});
+// =======================
+// EVENTOS MULTI (CORRECTOS)
+// =======================
 
+const multiDepto = document.getElementById("multi-depto");
+const multiEst = document.getElementById("multi-estacion");
+
+if (multiDepto && multiEst) {
+
+  multiDepto.addEventListener("change", () => {
+
+    const depto = multiDepto.value;
+
+    multiEst.innerHTML = "";
+
+    if (!depto) {
+      multiEst.disabled = true;
+      multiEst.innerHTML = `<option>-- Seleccione un departamento primero --</option>`;
+      return;
+    }
+
+    multiEst.disabled = false;
+
+    const estacionesDepto = window.gruposEstaciones[depto];
+
+    multiEst.innerHTML = `<option value="">-- Seleccione --</option>`;
+
+    estacionesDepto.sort().forEach(nombre => {
+      const opt = document.createElement("option");
+      opt.value = nombre;
+      opt.textContent = nombre;
+      multiEst.appendChild(opt);
+    });
+
+  });
+
+  multiEst.addEventListener("change", (e) => {
+    const estacion = e.target.value;
+    if (!estacion) return;
+
+    if (!estacionesSeleccionadas.includes(estacion)) {
+      estacionesSeleccionadas.push(estacion);
+      renderSeleccionadas();
+      actualizarGraficoMulti();
+    }
+  });
+}
+
+const multiDataset = document.getElementById("multi-dataset");
+const multiModo = document.getElementById("multi-modo");
+
+if (multiDataset) {
+  multiDataset.addEventListener("change", (e) => {
+    datasetSeleccionado = e.target.value;
+    actualizarGraficoMulti();
+  });
+}
+
+if (multiModo) {
+  multiModo.addEventListener("change", () => {
+    actualizarGraficoMulti();
+  });
+}
+// =========================
+// CARGAR ESTACIONES
+// =========================
+cargarEstaciones(estacionesLayer);
+// =========================
+// GEOJSON - DEPARTAMENTOS
+// =========================
+fetch('json/Mapa_limites.geojson')
+  .then(res => res.json())
+  .then(data => {
+    const geo = L.geoJSON(data, {
+      style: { color: "#403f3f", weight: 0.8, fillOpacity: 0 }
+    });
+    geo.eachLayer(layer => departamentosLayer.addLayer(layer));
+  })
+  .catch(err => console.error("Error departamentos:", err));
+// =========================
+// GEOJSON - RÍOS
+// =========================
+fetch('json/bol_rios1m.geojson')
+  .then(res => res.json())
+  .then(data => {
+    const geo = L.geoJSON(data, {
+      style: { color: "#00b4d8", weight: 1.5 }
+    });
+    geo.eachLayer(layer => riosLayer.addLayer(layer));
+  })
+  .catch(err => console.error("Error ríos:", err));
+
+  } else {
+    cargarEstaciones(null);
+  }
+});
 // =======================
 // CARGAR ESTACIONES
 // =======================
-async function cargarEstaciones() {
+async function cargarEstaciones(estacionesLayer) {
   const res = await fetch('datos/Stations_coord_UTF_8.csv');
   const text = await res.text();
 
@@ -92,314 +274,854 @@ async function cargarEstaciones() {
 
   rows.forEach(row => {
     const cols = row.split(",");
+
     const nombre = cols[2]?.trim();
     const departamento = cols[3]?.trim();
+    const lat = parseFloat(cols[5]);
+    const lon = parseFloat(cols[6]);
 
-    if (!nombre || !departamento) return;
+    if (!nombre || !departamento || isNaN(lat) || isNaN(lon)) return;
 
     estaciones.push({ nombre, departamento });
+
+    if (estacionesLayer) {
+      const marker = L.circleMarker([lat, lon], {
+        radius: 4,
+        color: "#000",
+        fillColor: "#43648b",
+        fillOpacity: 0.6
+      });
+
+      marker.bindPopup(`<strong>${nombre}</strong><br>${departamento}`);
+      marker.addTo(estacionesLayer);
+    }
   });
 
   renderizarEstaciones(estaciones);
 }
-
 // =======================
-// SELECTORES
+// LISTA
 // =======================
 function renderizarEstaciones(estaciones) {
 
   const selectDepto = document.getElementById("select-depto");
   const selectEst = document.getElementById("select-estacion");
+
+  //  NUEVOS (multi)
   const multiDepto = document.getElementById("multi-depto");
   const multiEst = document.getElementById("multi-estacion");
+
+  if (!selectDepto || !selectEst) return;
 
   const grupos = {};
 
   estaciones.forEach(est => {
-    if (!grupos[est.departamento]) grupos[est.departamento] = [];
+    if (!grupos[est.departamento]) {
+      grupos[est.departamento] = [];
+    }
     grupos[est.departamento].push(est.nombre);
   });
-
   window.gruposEstaciones = grupos;
-
+  // =========================
+  // LLENAR DEPARTAMENTOS
+  // =========================
   const deptos = Object.keys(grupos).sort();
 
-  const llenar = (select) => {
-    select.innerHTML = `<option value="">-- Seleccione --</option>`;
-    deptos.forEach(d => {
+  // --- PANEL ORIGINAL
+  selectDepto.innerHTML = `<option value="">-- Seleccione --</option>`;
+
+  deptos.forEach(depto => {
+    const opt = document.createElement("option");
+    opt.value = depto;
+    opt.textContent = depto;
+    selectDepto.appendChild(opt);
+  });
+
+  // --- PANEL MULTI 
+  if (multiDepto) {
+    multiDepto.innerHTML = `<option value="">-- Seleccione --</option>`;
+
+    deptos.forEach(depto => {
       const opt = document.createElement("option");
-      opt.value = d;
-      opt.textContent = d;
-      select.appendChild(opt);
+      opt.value = depto;
+      opt.textContent = depto;
+      multiDepto.appendChild(opt);
     });
-  };
+  }
+  // =========================
+  // EVENTO PANEL ORIGINAL
+  // =========================
+  selectDepto.addEventListener("change", () => {
 
-  if (selectDepto) llenar(selectDepto);
-  if (multiDepto) llenar(multiDepto);
-
-  // SINGLE
-  selectDepto?.addEventListener("change", () => {
     const depto = selectDepto.value;
 
     selectEst.innerHTML = "";
 
-    if (!depto) return;
+    if (!depto) {
+      selectEst.disabled = true;
+      selectEst.innerHTML = `<option>-- Seleccione un departamento primero --</option>`;
+      return;
+    }
 
-    grupos[depto].sort().forEach(nombre => {
+    selectEst.disabled = false;
+
+    const estacionesDepto = grupos[depto];
+
+    selectEst.innerHTML = `<option value="">-- Seleccione --</option>`;
+
+    estacionesDepto.sort().forEach(nombre => {
       const opt = document.createElement("option");
       opt.value = nombre;
       opt.textContent = nombre;
       selectEst.appendChild(opt);
     });
+
   });
+  
+  // =========================
+  // PANEL ORIGINAL (igual)
+  // =========================
+  selectEst.addEventListener("change", () => {
+    const estacion = selectEst.value;
+    if (!estacion) return;
 
-  selectEst?.addEventListener("change", () => {
-    actualizarAnalisis(selectEst.value);
-  });
-
-  // MULTI
-  multiDepto?.addEventListener("change", () => {
-    const depto = multiDepto.value;
-
-    multiEst.innerHTML = "";
-
-    if (!depto) return;
-
-    grupos[depto].sort().forEach(nombre => {
-      const opt = document.createElement("option");
-      opt.value = nombre;
-      opt.textContent = nombre;
-      multiEst.appendChild(opt);
-    });
-  });
-
-  multiEst?.addEventListener("change", (e) => {
-    const est = e.target.value;
-
-    if (!est || estacionesSeleccionadas.includes(est)) return;
-
-    estacionesSeleccionadas.push(est);
-    renderSeleccionadas();
-    actualizarGraficoMulti();
+    actualizarAnalisis(estacion);
   });
 }
 
 // =======================
-// SINGLE
+// ACTUALIZAR
 // =======================
 async function actualizarAnalisis(estacion) {
 
+  if (!estacion) return;
+
   const loader = document.getElementById("loader");
-  let interval;
 
   if (loader) {
     loader.classList.remove("hidden");
-    interval = iniciarLoader("texto-loader");
+    iniciarLoader();
   }
 
-  const res = await fetch(`${API_URL}/data/${encodeURIComponent(estacion)}`);
-  const data = await res.json();
+  try {
+    const res = await fetch(`${API_URL}/data/${encodeURIComponent(estacion)}`);
+    const data = await res.json();
 
-  datosActuales = data;
-  estacionActual = estacion;
+    datosActuales = data;
+    estacionActual = estacion;
 
-  graficar(data);
-  calcularEstadisticos(data);
+    graficar(data);
+    calcularEstadisticos(data);
 
-  if (loader) {
-    loader.classList.add("hidden");
-    detenerLoader(interval);
-  }
-}
-
-// =======================
-// AGRUPACIONES
-// =======================
-function agruparMensualFrontend(data) {
-  const agrupar = (serie) => {
-    const out = {};
-    Object.entries(serie).forEach(([f, v]) => {
-      if (v == null || isNaN(v)) return;
-      const key = f.slice(0, 7);
-      out[key] = (out[key] || 0) + v;
-    });
-    return out;
-  };
-
-  return {
-    base: agrupar(data.base),
-    imerg: agrupar(data.imerg),
-    chirps: agrupar(data.chirps)
-  };
-}
-
-function agruparMaximoMensual(data) {
-  const agrupar = (serie) => {
-    const out = {};
-    Object.entries(serie).forEach(([f, v]) => {
-      if (v == null || isNaN(v)) return;
-      const key = f.slice(0, 7);
-      out[key] = key in out ? Math.max(out[key], v) : v;
-    });
-    return out;
-  };
-
-  return {
-    base: agrupar(data.base),
-    imerg: agrupar(data.imerg),
-    chirps: agrupar(data.chirps)
-  };
-}
-
-// =======================
-// MÉTRICAS ROBUSTAS
-// =======================
-function filtrarPares(obs, sim) {
-  const o = [], s = [];
-
-  for (let i = 0; i < obs.length; i++) {
-    if (obs[i] != null && sim[i] != null && !isNaN(obs[i]) && !isNaN(sim[i])) {
-      o.push(obs[i]);
-      s.push(sim[i]);
+  } catch (err) {
+    console.error(err);
+  } finally {
+    if (loader) {
+      loader.classList.add("hidden");
+      detenerLoader();
     }
   }
-  return [o, s];
 }
 
-function rmse(obs, sim) {
-  [obs, sim] = filtrarPares(obs, sim);
-  return Math.sqrt(obs.reduce((a, v, i) => a + (v - sim[i]) ** 2, 0) / obs.length);
+// =======================
+// UNIFICAR
+// =======================
+function unificarFechas(data) {
+  const keys = new Set([
+    ...Object.keys(data.base),
+    ...Object.keys(data.imerg),
+    ...Object.keys(data.chirps)
+  ]);
+
+  const labels = Array.from(keys).sort();
+
+  const rellenar = (d) => labels.map(k => d[k] || 0);
+
+  return {
+    labels,
+    base: rellenar(data.base),
+    imerg: rellenar(data.imerg),
+    chirps: rellenar(data.chirps)
+  };
 }
 
-function r2(obs, sim) {
-  [obs, sim] = filtrarPares(obs, sim);
-  const mean = obs.reduce((a, b) => a + b, 0) / obs.length;
-  let ssTot = 0, ssRes = 0;
+function agruparMensualFrontend(dataDiario) {
+  const agrupar = (serie) => {
+    const out = {};
 
-  for (let i = 0; i < obs.length; i++) {
-    ssTot += (obs[i] - mean) ** 2;
-    ssRes += (obs[i] - sim[i]) ** 2;
+    Object.entries(serie).forEach(([fecha, valor]) => {
+      if (valor === null || isNaN(valor)) return;
+
+      const [y, m] = fecha.split("-");
+      const key = `${y}-${m}`;
+
+      out[key] = (out[key] || 0) + valor;
+    });
+
+    return out;
+  };
+
+  return {
+    base: agrupar(dataDiario.base),
+    imerg: agrupar(dataDiario.imerg),
+    chirps: agrupar(dataDiario.chirps)
+  };
+}
+
+function agruparMaximoMensual(dataDiario) {
+  const agrupar = (serie) => {
+    const out = {};
+
+    Object.entries(serie).forEach(([fecha, valor]) => {
+      if (valor === null || isNaN(valor)) return;
+
+      const [y, m] = fecha.split("-");
+      const key = `${y}-${m}`;
+
+      if (!(key in out)) {
+        out[key] = valor;
+      } else {
+        out[key] = Math.max(out[key], valor);
+      }
+    });
+
+    return out;
+  };
+
+  return {
+    base: agrupar(dataDiario.base),
+    imerg: agrupar(dataDiario.imerg),
+    chirps: agrupar(dataDiario.chirps)
+  };
+}
+
+// =======================
+// PLUGIN LEYENDA
+// =======================
+const legendTopRightPlugin = {
+  id: 'legendTopRight',
+
+  afterDraw(chart) {
+    const { ctx, chartArea } = chart;
+    const datasets = chart.data.datasets;
+
+    if (!chartArea) return;
+
+    const labels = datasets.map(d => d.label);
+    const colors = datasets.map(d => d.borderColor);
+
+    const padding = 8;
+    const lineHeight = 14;
+
+    const width = 160;
+    const height = labels.length * lineHeight + padding * 2;
+
+    const x = chartArea.right - width - 10;
+    const y = chartArea.top + 10;
+
+    ctx.save();
+
+    ctx.fillStyle = "rgba(255,255,255,0.85)";
+    ctx.strokeStyle = "#000";
+
+    ctx.fillRect(x, y, width, height);
+    ctx.strokeRect(x, y, width, height);
+
+    labels.forEach((label, i) => {
+      const yPos = y + padding + i * lineHeight + 8;
+
+      ctx.fillStyle = colors[i];
+      ctx.fillRect(x + 8, yPos - 6, 10, 10);
+
+      ctx.fillStyle = "#000";
+      ctx.font = "11px Arial";
+      ctx.fillText(label, x + 25, yPos);
+    });
+
+    ctx.restore();
   }
+};
 
-  return 1 - ssRes / ssTot;
+// =======================
+// BORDE AREA
+// =======================
+const chartAreaBorder = {
+  id: 'chartAreaBorder',
+  afterDraw(chart) {
+    const { ctx, chartArea } = chart;
+
+    ctx.save();
+    ctx.strokeStyle = "#000";
+    ctx.strokeRect(
+      chartArea.left,
+      chartArea.top,
+      chartArea.right - chartArea.left,
+      chartArea.bottom - chartArea.top
+    );
+    ctx.restore();
+  }
+};
+
+// =======================
+// GRAFICAR
+// =======================
+let chart;
+
+function graficar(dataRaw) {
+  const canvas = document.getElementById("grafico");
+  if (!canvas) return;
+
+  const ctx = canvas.getContext("2d");
+  
+  let dataProcesada;
+  if (modoGrafico === "mensual") {
+    dataProcesada = agruparMensualFrontend(dataRaw);
+  } else {
+    dataProcesada = agruparMaximoMensual(dataRaw);
+  }
+  
+  const data = unificarFechas(dataProcesada);
+
+  if (chart) chart.destroy();
+
+  chart = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: data.labels,
+      datasets: [
+        {
+          label: "SENAMHI",
+          data: data.base,
+          borderColor: "#1f77b4",
+          backgroundColor: "#1f77b4",
+          pointBackgroundColor: "#1f77b4",
+          pointBorderColor: "#1f77b4",
+          pointBorderWidth: 0,
+          pointRadius: 2,
+          pointHoverRadius: 3,
+          borderWidth: 1.5,
+          tension: 0.2
+        },
+        {
+          label: "IMERG",
+          data: data.imerg,
+          borderColor: "#d62728",
+          backgroundColor: "#d62728",
+          pointBackgroundColor: "#d62728",
+          pointBorderColor: "#d62728",
+          pointBorderWidth: 0,
+          pointRadius: 2,
+          pointHoverRadius: 3,
+          borderWidth: 1.5,
+          tension: 0.2
+        },
+        {
+          label: "CHIRPS",
+          data: data.chirps,
+          borderColor: "#2ca02c",
+          backgroundColor: "#2ca02c",
+          pointBackgroundColor: "#2ca02c",
+          pointBorderColor: "#2ca02c",
+          pointBorderWidth: 0,
+          pointRadius: 2,
+          pointHoverRadius: 3,
+          borderWidth: 1.5,
+          tension: 0.2
+        }
+      ]
+    },
+    plugins: [legendTopRightPlugin, chartAreaBorder],
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+
+      plugins: {
+        title: {
+          display: true,
+          text: modoGrafico === "mensual"
+            ? `Serie de precipitación mensual estación: ${estacionActual}`
+            : `Análisis de máximos diarios mensuales - Estación: ${estacionActual}`,
+          font: { size: 16, weight: 'bold' }
+        },
+        legend: { display: false }
+      },
+
+      scales: {
+        x: {
+          title: {
+            display: true,
+            text: "Años",
+            font: {
+              size: 12,
+              weight: 'bold' 
+            }
+          },
+          ticks: {
+            autoSkip: false,
+            maxRotation: 0,   
+            minRotation: 0,
+            callback: function(value, index) {
+              const label = this.getLabelForValue(value);
+              const [year, month] = label.split("-");
+              
+              if (month === "01" && parseInt(year) % 2 === 0) {
+              return year;
+              }
+              
+               return "";
+            }
+          },
+          grid: {
+            display: true,
+            borderDash: [6, 4],
+            color: "rgba(0,0,0,0.2)",
+            // solo en enero cada 2 años
+            lineWidth: function(ctx) {
+              const label = ctx.chart.data.labels[ctx.index];
+              const [year, month] = label.split("-");
+      
+              return (month === "01" && parseInt(year) % 2 === 0) ? 1.5 : 0;
+            }
+          }
+        },
+        y: {
+          title: {
+            display: true,
+            text: "Precipitación mensual [mm]",
+            font: {
+              size: 12,
+              weight: 'bold'
+            }
+          },
+          beginAtZero: true,   
+          ticks: {
+            stepSize: 100
+          },
+          suggestedMax: function(context) {
+              const datasets = context.chart.data.datasets;
+          
+              let max = 0;
+          
+              datasets.forEach(ds => {
+                const localMax = Math.max(...ds.data);
+                if (localMax > max) max = localMax;
+              });
+          
+              return max + 100; 
+            },
+          grid: {
+            display: true,
+            borderDash: [6, 4],
+            color: "rgba(0,0,0,0.2)"
+          }
+        }
+      }
+    }
+  });
 }
-
+// =======================
+// MÉTRICAS
+// =======================
 function nash(obs, sim) {
-  [obs, sim] = filtrarPares(obs, sim);
-  const mean = obs.reduce((a, b) => a + b, 0) / obs.length;
-
+  const mean = obs.reduce((a,b)=>a+b,0) / obs.length;
   let num = 0, den = 0;
+
   for (let i = 0; i < obs.length; i++) {
     num += (obs[i] - sim[i]) ** 2;
     den += (obs[i] - mean) ** 2;
   }
+  return 1 - num/den;
+}
 
-  return 1 - num / den;
+function rmse(obs, sim) {
+  let sum = 0;
+  for (let i = 0; i < obs.length; i++) {
+    sum += (obs[i] - sim[i]) ** 2;
+  }
+  return Math.sqrt(sum / obs.length);
+}
+
+function r2(obs, sim) {
+  const meanObs = obs.reduce((a,b)=>a+b,0) / obs.length;
+
+  let ssTot = 0;
+  let ssRes = 0;
+
+  for (let i = 0; i < obs.length; i++) {
+    ssTot += (obs[i] - meanObs) ** 2;
+    ssRes += (obs[i] - sim[i]) ** 2;
+  }
+
+  return 1 - (ssRes / ssTot);
+}
+
+function porcentajeDatos(serie) {
+  const total = serie.length;
+
+  const validos = serie.filter(v =>
+    v !== null && v !== undefined && !isNaN(v)
+  ).length;
+
+  return (validos / total) * 100;
+}
+
+function obtenerRangoFechasReales(dataBase) {
+  const fechas = Object.keys(dataBase)
+    .filter(f => dataBase[f] !== null && !isNaN(dataBase[f]))
+    .sort();
+
+  if (fechas.length === 0) {
+    return { inicio: "-", fin: "-" };
+  }
+
+  return {
+    inicio: fechas[0],
+    fin: fechas[fechas.length - 1]
+  };
+}
+function formatearFecha(fecha, modo) {
+  if (!fecha) return "-";
+
+  const [y, m, d] = fecha.split("-");
+
+  if (modo === "mensual") {
+    return `${m}/${y}`;
+  } else {
+    return `${d}/${m}/${y}`;
+  }
 }
 
 // =======================
-// MULTI
+// ESTADISTICOS
 // =======================
+function calcularEstadisticos(dataRaw) {
+  const el = document.getElementById("estadisticos");
+  if (!el) return;
+
+  let dataProcesada;
+
+  if (modoGrafico === "mensual") {
+    dataProcesada = agruparMensualFrontend(dataRaw);
+  } else {
+    dataProcesada = agruparMaximoMensual(dataRaw);
+  }
+
+  const data = unificarFechas(dataProcesada);
+
+  const { inicio, fin } = obtenerRangoFechasReales(dataRaw.base);
+
+  const nashI = nash(data.base, data.imerg);
+  const nashC = nash(data.base, data.chirps);
+
+  const rmseI = rmse(data.base, data.imerg);
+  const rmseC = rmse(data.base, data.chirps);
+
+  const r2I = r2(data.base, data.imerg);
+  const r2C = r2(data.base, data.chirps);
+
+  const tituloPorcentaje = modoGrafico === "mensual"
+  ? "Porcentaje de meses con datos:"
+  : "Porcentaje de días con datos:";
+
+  let pBase;
+
+  if (modoGrafico === "mensual") {
+    const mensual = agruparMensualFrontend(dataRaw).base;
+    pBase = porcentajeDatos(Object.values(mensual));
+  } else {
+    pBase = porcentajeDatos(Object.values(dataRaw.base));
+  }
+
+  el.innerHTML = `
+  <div class="stats-container">
+
+    <div class="stats-left">
+      <h3>Métricas:</h3>
+
+      <p><strong>Nash IMERG:</strong> ${nashI.toFixed(3)} |
+         <strong>R² IMERG:</strong> ${r2I.toFixed(3)} | 
+         <strong>RMSE IMERG:</strong> ${rmseI.toFixed(2)}</p>
+
+      <p><strong>Nash CHIRPS:</strong> ${nashC.toFixed(3)} |
+         <strong>R² CHIRPS:</strong> ${r2C.toFixed(3)} |
+         <strong>RMSE CHIRPS:</strong> ${rmseC.toFixed(2)}</p>
+    </div>
+
+    <div class="stats-center">
+      <h3>${tituloPorcentaje}</h3>
+      <p><strong>SENAMHI:</strong> ${pBase.toFixed(1)}%</p>
+      <p><strong>Fecha inicio:</strong> ${formatearFecha(inicio, modoGrafico)}</p>
+      <p><strong>Fecha final:</strong> ${formatearFecha(fin, modoGrafico)}</p>
+    </div>
+
+  </div>
+`;
+}
+
+function descargarDatos(tipo) {
+  if (!datosActuales || !estacionActual) {
+    alert("Primero selecciona una estación.");
+    return;
+  }
+
+  let dataProcesada;
+
+  if (modoGrafico === "mensual") {
+    dataProcesada = agruparMensualFrontend(datosActuales);
+  } else {
+    dataProcesada = datosActuales;
+  }
+
+  const wb = XLSX.utils.book_new();
+
+  const datasets = Object.keys(dataProcesada);
+
+  const crearHoja = (serie, nombreHoja) => {
+
+    const rows = Object.entries(serie).map(([fecha, valor]) => ({
+      "Fecha": fecha,
+      [`${estacionActual} [mm]`]: valor
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(rows);
+
+    ws['!cols'] = [
+      { wch: 12 }, // Fecha
+      { wch: 18 }  // Valor
+    ];
+
+    XLSX.utils.book_append_sheet(wb, ws, nombreHoja);
+  };
+
+  if (tipo === "all") {
+    
+    datasets.forEach(ds => {
+      crearHoja(dataProcesada[ds], ds.toUpperCase());
+    });
+  } else {
+    if (!dataProcesada[tipo]) {
+      alert("No existe ese dataset.");
+      return;
+    }
+    crearHoja(dataProcesada[tipo], tipo.toUpperCase());
+  }
+
+  const nombreArchivo = `${estacionActual}_${modoGrafico}.xlsx`;
+
+  XLSX.writeFile(wb, nombreArchivo);
+}
+
+function renderSeleccionadas() {
+  const container = document.getElementById("multi-seleccionadas");
+  container.innerHTML = "";
+
+  estacionesSeleccionadas.forEach((est, i) => {
+
+    const chip = document.createElement("div");
+    chip.className = "chip";
+
+    chip.innerHTML = `
+      ${est}
+      <span data-index="${i}">✕</span>
+    `;
+
+    container.appendChild(chip);
+  });
+
+  // eliminar estación
+  container.querySelectorAll("span").forEach(el => {
+    el.addEventListener("click", (e) => {
+      const index = e.target.dataset.index;
+      estacionesSeleccionadas.splice(index, 1);
+
+      renderSeleccionadas();
+      actualizarGraficoMulti();
+    });
+  });
+}
+
 async function actualizarGraficoMulti() {
 
   if (estacionesSeleccionadas.length === 0) return;
 
   const loader = document.getElementById("multi-loader");
-  let interval;
 
   if (loader) {
     loader.classList.remove("hidden");
-    interval = iniciarLoader("multi-texto-loader");
+    iniciarLoaderMulti();
   }
 
-  const series = [];
+  try {
 
-  for (const est of estacionesSeleccionadas) {
+    const series = [];
 
-    const res = await fetch(`${API_URL}/data/${encodeURIComponent(est)}`);
-    const data = await res.json();
+    for (const estacion of estacionesSeleccionadas) {
 
-    let serie;
+      const res = await fetch(`${API_URL}/data/${encodeURIComponent(estacion)}`);
+      const data = await res.json();
 
-    if (modoGraficoMulti === "mensual") {
-      serie = agruparMensualFrontend(data)[datasetSeleccionado];
-    } else {
-      serie = agruparMaximoMensual(data)[datasetSeleccionado];
+      let serie;
+
+      if (modoGraficoMulti  === "mensual") {
+        serie = agruparMensualFrontend(data)[datasetSeleccionado];
+      } else {
+        serie = data[datasetSeleccionado];
+      }
+
+      series.push({
+        nombre: estacion,
+        data: serie
+      });
     }
 
-    series.push({ nombre: est, data: serie });
-  }
+    const dataFinal = unificarMultiEstaciones(series);
 
-  // asegurar referencia primero
-  series.sort((a, b) => a.nombre === estacionesSeleccionadas[0] ? -1 : 1);
+    graficarMulti(dataFinal);
 
-  const dataFinal = unificarMulti(series);
 
-  graficarMulti(dataFinal);
-  renderMetricasMulti(dataFinal);
+    const metricas = calcularMetricasMulti(dataFinal);
+    renderMetricasMulti(metricas);
 
-  if (loader) {
-    loader.classList.add("hidden");
-    detenerLoader(interval);
+  } catch (err) {
+    console.error("Error en multi análisis:", err);
+  } finally {
+
+    if (loader) {
+      loader.classList.add("hidden");
+      detenerLoaderMulti();
+    }
   }
 }
 
-// =======================
-// UNIFICAR MULTI
-// =======================
-function unificarMulti(series) {
+function graficarMulti(data) {
+
+  const canvas = document.getElementById("grafico-multi");
+  if (!canvas) return;
+
+  const ctx = canvas.getContext("2d");
+
+  if (chartMulti) chartMulti.destroy();
+
+  chartMulti = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: data.labels,
+      datasets: data.datasets
+    },
+    plugins: [legendTopRightPlugin, chartAreaBorder], 
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+
+      plugins: {
+        title: {
+          display: true,
+          text: `Comparación multi-estación (${datasetSeleccionado.toUpperCase()})`,
+          font: { size: 16, weight: 'bold' }
+        },
+        legend: { display: false }
+      },
+
+      scales: {
+        x: {
+          title: {
+            display: true,
+            text: "Años",
+            font: { size: 12, weight: 'bold' }
+          },
+          ticks: {
+            autoSkip: false,
+            maxRotation: 0,
+            callback: function(value) {
+              const label = this.getLabelForValue(value);
+              const [year, month] = label.split("-");
+              if (month === "01" && parseInt(year) % 2 === 0) {
+                return year;
+              }
+              return "";
+            }
+          }
+        },
+        y: {
+          title: {
+            display: true,
+            text: "Precipitación [mm]",
+            font: { size: 12, weight: 'bold' }
+          },
+          beginAtZero: true
+        }
+      }
+    }
+  });
+}
+
+function unificarMultiEstaciones(seriesPorEstacion) {
 
   const keys = new Set();
 
-  series.forEach(s => {
+  // recolectar todas las fechas
+  seriesPorEstacion.forEach(s => {
     Object.keys(s.data).forEach(k => keys.add(k));
   });
 
   const labels = Array.from(keys).sort();
 
-  const datasets = series.map((s, i) => ({
-    label: s.nombre,
-    data: labels.map(f => s.data[f] ?? null),
-    borderColor: generarColor(i),
-    tension: 0.2
-  }));
+  const datasets = seriesPorEstacion.map((s, i) => {
+
+    const data = labels.map(f => s.data[f] ?? null);
+
+    return {
+      label: s.nombre,
+      data,
+      borderColor: generarColor(i),
+      backgroundColor: generarColor(i),
+      pointRadius: 2,
+      tension: 0.2,
+      borderWidth: 1.5
+    };
+  });
 
   return { labels, datasets };
 }
 
-// =======================
-// COLORES
-// =======================
 function generarColor(i) {
   const colores = [
-    "#1f77b4","#d62728","#2ca02c",
-    "#9467bd","#ff7f0e","#17becf"
+    "#1f77b4", "#d62728", "#2ca02c",
+    "#9467bd", "#ff7f0e", "#17becf",
+    "#8c564b"
   ];
   return colores[i % colores.length];
 }
 
-// =======================
-// METRICAS MULTI
-// =======================
-function renderMetricasMulti(data) {
+function calcularMetricasMulti(data) {
+
+  const base = data.datasets[0].data;
+
+  const resultados = data.datasets.slice(1).map(ds => {
+
+    return {
+      nombre: ds.label,
+      nash: nash(base, ds.data),
+      rmse: rmse(base, ds.data),
+      r2: r2(base, ds.data)
+    };
+  });
+
+  return resultados;
+}
+
+function renderMetricasMulti(metricas) {
 
   const el = document.getElementById("estadisticos-multi");
   if (!el) return;
 
-  const base = data.datasets[0].data;
-
-  const html = data.datasets.slice(1).map(ds => {
-
-    return `
-      <p><strong>${ds.label}</strong> |
-      Nash: ${nash(base, ds.data).toFixed(3)} |
-      R²: ${r2(base, ds.data).toFixed(3)} |
-      RMSE: ${rmse(base, ds.data).toFixed(2)}</p>
-    `;
-  }).join("");
-
   el.innerHTML = `
-    <h3>Métricas (ref: ${data.datasets[0].label})</h3>
-    ${html}
+    <h3>Métricas (referencia: ${estacionesSeleccionadas[0]})</h3>
+    ${metricas.map(m => `
+      <p><strong>${m.nombre}</strong> |
+      Nash: ${m.nash.toFixed(3)} |
+      R²: ${m.r2.toFixed(3)} |
+      RMSE: ${m.rmse.toFixed(2)}</p>
+    `).join("")}
   `;
 }
