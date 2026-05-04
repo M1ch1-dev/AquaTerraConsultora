@@ -934,9 +934,21 @@ input:checked + .slider:before {
 }
 
 .multi-filtros-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.multi-fila {
+  display: flex;
   gap: 20px;
+  align-items: flex-end;
+}
+
+.multi-campo {
+  display: flex;
+  flex-direction: column;
+  width: 30%;
 }
 
 .multi-col {
