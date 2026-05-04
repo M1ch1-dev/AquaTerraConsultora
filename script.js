@@ -111,7 +111,13 @@ const ZoomControl = L.Control.extend({
 // =======================
 document.addEventListener("DOMContentLoaded", () => {
 
+  // 1. Definir elementos del DOM primero
   const selectModo = document.getElementById("select-modo");
+  const multiModo = document.getElementById("multi-modo");
+  const multiDepto = document.getElementById("multi-depto");
+  const multiEst = document.getElementById("multi-estacion");
+  const multiDataset = document.getElementById("multi-dataset");
+  const mapContainer = document.getElementById("map");
 
   if (selectModo) {
     selectModo.addEventListener("change", () => {
@@ -124,26 +130,29 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
- if (multiModo) {
-  multiModo.addEventListener("change", (e) => {
-    modoGraficoMulti = e.target.value;
-    actualizarGraficoMulti();
-  });
-}
-  
-  const mapContainer = document.getElementById("map");
+ // 3. Eventos Panel Multi
+  if (multiModo) {
+    multiModo.addEventListener("change", (e) => {
+      modoGraficoMulti = e.target.value;
+      actualizarGraficoMulti();
+    });
+  }
 
-  if (mapContainer) {
+  if (multiDataset) {
+    multiDataset.addEventListener("change", (e) => {
+      datasetSeleccionado = e.target.value;
+      actualizarGraficoMulti();
+    });
+  }
 
+if (mapContainer) {
   map = L.map('map', { zoomControl: false })
   .setView([-16.5, -64.5], 5);
-
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '&copy; OpenStreetMap'
-}).addTo(map);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap'
+  }).addTo(map);
     
-map.addControl(new ZoomControl());    
-
+  map.addControl(new ZoomControl());    
 // =========================
 // CAPAS
 // =========================
@@ -157,6 +166,8 @@ const capasControl = L.control.layers(null, {
   "Ríos": riosLayer,
   "Departamentos": departamentosLayer
 }, { position: 'topright' }).addTo(map);
+
+cargarEstaciones(estacionesLayer);
 
 // Hover automático (como tenías antes)
 const container = capasControl.getContainer();
@@ -1056,20 +1067,15 @@ function graficarMulti(data) {
 }
 
 function unificarMultiEstaciones(seriesPorEstacion) {
-
   const keys = new Set();
-
   // recolectar todas las fechas
   seriesPorEstacion.forEach(s => {
     Object.keys(s.data).forEach(k => keys.add(k));
   });
 
   const labels = Array.from(keys).sort();
-
   const datasets = seriesPorEstacion.map((s, i) => {
-
     const data = labels.map(f => s.data[f] ?? null);
-
     return {
       label: s.nombre,
       data,
@@ -1080,7 +1086,6 @@ function unificarMultiEstaciones(seriesPorEstacion) {
       borderWidth: 1.5
     };
   });
-
   return { labels, datasets };
 }
 
