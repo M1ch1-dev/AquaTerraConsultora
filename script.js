@@ -85,11 +85,11 @@ const ZoomControl = L.Control.extend({
 // =======================
 document.addEventListener("DOMContentLoaded", () => {
 
-  const toggle = document.getElementById("toggleModo");
+  const selectModo = document.getElementById("select-modo");
 
-  if (toggle) {
-    toggle.addEventListener("change", () => {
-      modoGrafico = toggle.checked ? "max" : "mensual";
+  if (selectModo) {
+    selectModo.addEventListener("change", () => {
+      modoGrafico = selectModo.value;
   
       if (datosActuales) {
         graficar(datosActuales);
