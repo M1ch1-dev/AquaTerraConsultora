@@ -158,7 +158,7 @@ if (mapContainer) {
 // =========================
 const estacionesLayer = L.layerGroup().addTo(map);
 const riosLayer = L.layerGroup();
-const departamentosLayer = L.layerGroup();
+const departamentosLayer = L.layerGroup().addTo(map);
 
 // Control de capas (botón)
 const capasControl = L.control.layers(null, {
@@ -299,8 +299,6 @@ async function cargarEstaciones(estacionesLayer) {
       const marker = L.circleMarker([lat, lon], {
         radius: 4,
         color: "#43648b",
-        fillColor: "#43648b",
-        fillOpacity: 0.3
       });
 
       marker.bindPopup(`<strong>${nombre}</strong><br>${departamento}`);
