@@ -745,9 +745,8 @@ function calcularEstadisticos(dataRaw) {
 }
 
 function descargarDatos(tipo) {
-
   if (!datosActuales || !estacionActual) {
-    alert("Seleccione una estación primero");
+    alert("Primero selecciona una estación.");
     return;
   }
 
@@ -756,48 +755,44 @@ function descargarDatos(tipo) {
   if (modoGrafico === "mensual") {
     dataProcesada = agruparMensualFrontend(datosActuales);
   } else {
-    dataProcesada = datosActuales; // diario
+    dataProcesada = datosActuales;
   }
 
-  const data = unificarFechas(dataProcesada);
+  const wb = XLSX.utils.book_new();
 
-  let filas = [];
+  const datasets = Object.keys(dataProcesada);
 
-  // encabezado
-  filas.push(["Fecha", "SENAMHI", "IMERG", "CHIRPS"]);
+  const crearHoja = (serie, nombreHoja) => {
 
-  data.labels.forEach((fecha, i) => {
-    filas.push([
-      fecha,
-      data.base[i],
-      data.imerg[i],
-      data.chirps[i]
-    ]);
-  });
+    const rows = Object.entries(serie).map(([fecha, valor]) => ({
+      "Fecha": fecha,
+      [`${estacionActual} [mm]`]: valor
+    }));
 
-  // filtrar según botón
-  if (tipo !== "all") {
-    const indexMap = {
-      base: 1,
-      imerg: 2,
-      chirps: 3
-    };
+    const ws = XLSX.utils.json_to_sheet(rows);
 
-    const idx = indexMap[tipo];
+    ws['!cols'] = [
+      { wch: 12 }, // Fecha
+      { wch: 18 }  // Valor
+    ];
 
-    filas = filas.map(row => [row[0], row[idx]]);
+    XLSX.utils.book_append_sheet(wb, ws, nombreHoja);
+  };
+
+  if (tipo === "all") {
+    
+    datasets.forEach(ds => {
+      crearHoja(dataProcesada[ds], ds.toUpperCase());
+    });
+  } else {
+    if (!dataProcesada[tipo]) {
+      alert("No existe ese dataset.");
+      return;
+    }
+    crearHoja(dataProcesada[tipo], tipo.toUpperCase());
   }
 
-  // convertir a CSV (Excel lo abre perfecto)
-  const csv = filas.map(r => r.join(",")).join("\n");
+  const nombreArchivo = `${estacionActual}_${modoGrafico}.xlsx`;
 
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `${estacionActual}_${tipo}_${modoGrafico}.csv`;
-  a.click();
-
-  URL.revokeObjectURL(url);
+  XLSX.writeFile(wb, nombreArchivo);
 }
