@@ -70,6 +70,7 @@ let modoGrafico = "mensual"; // "mensual" | "max"
 let map;
 let estacionesSeleccionadas = [];
 let datasetSeleccionado = "base";
+let chartMulti;
 
 const ZoomControl = L.Control.extend({
   options: { position: 'topright' },
@@ -157,6 +158,25 @@ container.addEventListener('mouseenter', () => {
 container.addEventListener('mouseleave', () => {
   container.classList.remove('leaflet-control-layers-expanded');
 });
+// =======================
+// EVENTOS MULTI (CORRECTOS)
+// =======================
+
+const multiDataset = document.getElementById("multi-dataset");
+const multiModo = document.getElementById("multi-modo");
+
+if (multiDataset) {
+  multiDataset.addEventListener("change", (e) => {
+    datasetSeleccionado = e.target.value;
+    actualizarGraficoMulti();
+  });
+}
+
+if (multiModo) {
+  multiModo.addEventListener("change", () => {
+    actualizarGraficoMulti();
+  });
+}
 // =========================
 // CARGAR ESTACIONES
 // =========================
@@ -884,26 +904,6 @@ function descargarDatos(tipo) {
   XLSX.writeFile(wb, nombreArchivo);
 }
 
-document.getElementById("multi-dataset")
-  .addEventListener("change", (e) => {
-    datasetSeleccionado = e.target.value;
-    actualizarGraficoMulti();
-  });
-
-document.getElementById("multi-estacion")
-  .addEventListener("change", (e) => {
-
-    const est = e.target.value;
-    if (!est) return;
-
-    // evitar duplicados
-    if (!estacionesSeleccionadas.includes(est)) {
-      estacionesSeleccionadas.push(est);
-      renderSeleccionadas();
-      actualizarGraficoMulti();
-    }
-  });
-
 function renderSeleccionadas() {
   const container = document.getElementById("multi-seleccionadas");
   container.innerHTML = "";
@@ -985,8 +985,6 @@ async function actualizarGraficoMulti() {
     }
   }
 }
-
-let chartMulti;
 
 function graficarMulti(data) {
 
