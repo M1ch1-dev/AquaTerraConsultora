@@ -298,9 +298,9 @@ async function cargarEstaciones(estacionesLayer) {
     if (estacionesLayer) {
       const marker = L.circleMarker([lat, lon], {
         radius: 4,
-        color: "#000",
+        color: "#43648b",
         fillColor: "#43648b",
-        fillOpacity: 0.6
+        fillOpacity: 0.3
       });
 
       marker.bindPopup(`<strong>${nombre}</strong><br>${departamento}`);
