@@ -427,10 +427,11 @@ footer {
 #mapa-section {
   padding: 40px 40px;
   background: #f5f7fa;
+  max-width: 1400px;
 }
 
 .mapa-wrapper {
-  max-width: 1000px;
+  max-width: 1200px;
   margin: 0 auto;
 }
 
