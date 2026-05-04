@@ -854,3 +854,31 @@ input:checked + .slider:before {
   font-weight: bold;
   margin-bottom: 10px;
 }
+
+.filtros-grid {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+/* IZQUIERDA */
+.filtros-left {
+  width: 30%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* DERECHA */
+.filtros-right {
+  width: 40%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* SELECTS MÁS COMPACTOS */
+.filtros-left select {
+  width: 100%;
+}
