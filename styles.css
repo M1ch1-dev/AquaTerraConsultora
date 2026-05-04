@@ -960,3 +960,30 @@ input:checked + .slider:before {
   flex: 1;
   max-width: 30%;
 }
+
+/* Contenedor para agrupar versión y menú */
+.header-right-group {
+  display: flex;
+  align-items: center; /* Alineación vertical perfecta */
+  gap: 15px;           /* Espacio entre el texto y el botón */
+}
+
+/* Estilo del texto de versión */
+.version-text {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.8); /* Blanco sutilmente transparente */
+  background: rgba(0, 0, 0, 0.1);   /* Un fondo muy suave para que resalte */
+  padding: 4px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+  white-space: nowrap; /* Evita que el texto se parta en dos líneas */
+}
+
+/* Asegúrate de que el header-container maneje bien los extremos */
+.header-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 2rem; /* Ajusta según necesites */
+}
