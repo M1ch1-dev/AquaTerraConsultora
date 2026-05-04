@@ -55,21 +55,13 @@
 
   <div id="panel-analisis" class="panel">
 
-    <h2>Análisis</h2>
-
-    <!-- TOGGLE -->
-    <div class="panel-section">
-      <label>
-        <input type="checkbox" id="toggleModo">
-        Activar análisis de máximos diarios mensuales
-      </label>
-    </div>
+    <h2>Análisis de 1 estación</h2>
 
     <!-- FILTROS -->
-    <div class="panel-section filtros-grid">
+  <div class="panel-section filtros-grid">
 
-  <!-- IZQUIERDA -->
-  <div class="filtros-left">
+    <!-- IZQUIERDA -->
+    <div class="filtros-left">
       <label>Elija departamento:</label>
       <select id="select-depto"></select>
   
@@ -80,19 +72,12 @@
     <!-- DERECHA -->
     <div class="filtros-right">
       <label>Elija tipo de análisis:</label>
-  
-      <div class="toggle-container">
-        <span>Mensual</span>
-  
-        <label class="switch">
-          <input type="checkbox" id="toggleModo">
-          <span class="slider"></span>
-        </label>
-  
-        <span>Máximos</span>
-      </div>
+      <select id="select-modo">
+        <option value="mensual">Serie de acumulados mensuales</option>
+        <option value="max">Serie de máximos mensuales</option>
+      </select>
     </div>
-  
+
   </div>
 
     <!-- LOADER -->
