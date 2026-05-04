@@ -162,6 +162,50 @@ container.addEventListener('mouseleave', () => {
 // EVENTOS MULTI (CORRECTOS)
 // =======================
 
+const multiDepto = document.getElementById("multi-depto");
+const multiEst = document.getElementById("multi-estacion");
+
+if (multiDepto && multiEst) {
+
+  multiDepto.addEventListener("change", () => {
+
+    const depto = multiDepto.value;
+
+    multiEst.innerHTML = "";
+
+    if (!depto) {
+      multiEst.disabled = true;
+      multiEst.innerHTML = `<option>-- Seleccione un departamento primero --</option>`;
+      return;
+    }
+
+    multiEst.disabled = false;
+
+    const estacionesDepto = window.gruposEstaciones[depto];
+
+    multiEst.innerHTML = `<option value="">-- Seleccione --</option>`;
+
+    estacionesDepto.sort().forEach(nombre => {
+      const opt = document.createElement("option");
+      opt.value = nombre;
+      opt.textContent = nombre;
+      multiEst.appendChild(opt);
+    });
+
+  });
+
+  multiEst.addEventListener("change", (e) => {
+    const estacion = e.target.value;
+    if (!estacion) return;
+
+    if (!estacionesSeleccionadas.includes(estacion)) {
+      estacionesSeleccionadas.push(estacion);
+      renderSeleccionadas();
+      actualizarGraficoMulti();
+    }
+  });
+}
+
 const multiDataset = document.getElementById("multi-dataset");
 const multiModo = document.getElementById("multi-modo");
 
@@ -269,6 +313,7 @@ function renderizarEstaciones(estaciones) {
     }
     grupos[est.departamento].push(est.nombre);
   });
+  window.gruposEstaciones = grupos;
   // =========================
   // LLENAR DEPARTAMENTOS
   // =========================
@@ -324,53 +369,7 @@ function renderizarEstaciones(estaciones) {
     });
 
   });
-  // =========================
-  // EVENTO PANEL MULTI 
-  // =========================
-  if (multiDepto && multiEst) {
-
-    multiDepto.addEventListener("change", () => {
-
-      const depto = multiDepto.value;
-
-      multiEst.innerHTML = "";
-
-      if (!depto) {
-        multiEst.disabled = true;
-        multiEst.innerHTML = `<option>-- Seleccione un departamento primero --</option>`;
-        return;
-      }
-      multiEst.disabled = false;
-
-      const estacionesDepto = grupos[depto];
-
-      multiEst.innerHTML = `<option value="">-- Seleccione --</option>`;
-
-      estacionesDepto.sort().forEach(nombre => {
-        const opt = document.createElement("option");
-        opt.value = nombre;
-        opt.textContent = nombre;
-        multiEst.appendChild(opt);
-      });
-
-    });
-
-  }
-  // =========================
-  // SELECCIÓN MULTI 
-  // =========================
-  if (multiEst) {
-    multiEst.addEventListener("change", (e) => {
-      const estacion = e.target.value;
-      if (!estacion) return;
-
-      if (!estacionesSeleccionadas.includes(estacion)) {
-        estacionesSeleccionadas.push(estacion);
-        renderSeleccionadas();
-        actualizarGraficoMulti();
-      }
-    });
-  }
+  
   // =========================
   // PANEL ORIGINAL (igual)
   // =========================
