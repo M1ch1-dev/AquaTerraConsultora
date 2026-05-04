@@ -39,6 +39,28 @@ function iniciarLoader() {
 function detenerLoader() {
   clearInterval(intervaloLoader);
 }
+
+let intervaloLoaderMulti = null;
+let puntosMulti = 1;
+
+function iniciarLoaderMulti() {
+  const texto = document.getElementById("multi-texto-loader");
+  if (!texto) return;
+
+  puntosMulti = 1;
+
+  intervaloLoaderMulti = setInterval(() => {
+    puntosMulti++;
+    if (puntosMulti > 4) puntosMulti = 1;
+
+    texto.textContent = "Cargando datos" + ".".repeat(puntosMulti);
+  }, 400);
+}
+
+function detenerLoaderMulti() {
+  clearInterval(intervaloLoaderMulti);
+}
+
 // =======================
 // ESTADO GLOBAL
 // =======================
