@@ -743,3 +743,18 @@ function calcularEstadisticos(dataRaw) {
   </div>
 `;
 }
+
+document.getElementById("btn-descargar").addEventListener("click", () => {
+
+  if (!datosActuales || !estacionActual) return;
+
+  let dataProcesada;
+
+  if (modoGrafico === "mensual") {
+    dataProcesada = agruparMensualFrontend(datosActuales);
+  } else {
+    dataProcesada = datosActuales; // diario original
+  }
+
+  descargarCSV(dataProcesada, estacionActual);
+});
