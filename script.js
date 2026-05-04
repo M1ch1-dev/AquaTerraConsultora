@@ -276,20 +276,11 @@ function renderizarEstaciones(estaciones) {
 }
 
 // =======================
-// EVENTO CHECK
-// =======================
-document.addEventListener("change", (e) => {
-  if (e.target.type === "checkbox") actualizarAnalisis();
-});
-
-// =======================
 // ACTUALIZAR
 // =======================
 async function actualizarAnalisis(estacion) {
 
-  if (checks.length === 0) return;
-
-  const estacion = checks[0].value;
+  if (!estacion) return;
 
   const loader = document.getElementById("loader");
 
@@ -311,7 +302,6 @@ async function actualizarAnalisis(estacion) {
   } catch (err) {
     console.error(err);
   } finally {
-
     if (loader) {
       loader.classList.add("hidden");
       detenerLoader();
