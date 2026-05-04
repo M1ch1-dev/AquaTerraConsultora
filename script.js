@@ -718,7 +718,7 @@ function graficar(dataRaw) {
                 if (localMax > max) max = localMax;
               });
           
-              return max + 100; 
+              return max + 50; 
             },
           grid: {
             display: true,
@@ -1055,6 +1055,18 @@ function graficarMulti(data) {
               }
               return "";
             }
+          },
+          grid: {
+            display: true,
+            borderDash: [6, 4],
+            color: "rgba(0,0,0,0.2)",
+            // solo en enero cada 2 años
+            lineWidth: function(ctx) {
+              const label = ctx.chart.data.labels[ctx.index];
+              const [year, month] = label.split("-");
+      
+              return (month === "01" && parseInt(year) % 2 === 0) ? 1.5 : 0;
+            }
           }
         },
         y: {
@@ -1063,7 +1075,19 @@ function graficarMulti(data) {
             text: "Precipitación [mm]",
             font: { size: 12, weight: 'bold' }
           },
-          beginAtZero: true
+          beginAtZero: true,
+          suggestedMax: function(context) {
+              const datasets = context.chart.data.datasets;
+          
+              let max = 0;
+          
+              datasets.forEach(ds => {
+                const localMax = Math.max(...ds.data);
+                if (localMax > max) max = localMax;
+              });
+          
+              return max + 50; 
+            },
         }
       }
     }
