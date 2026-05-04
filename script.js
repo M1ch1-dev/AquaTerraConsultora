@@ -135,12 +135,10 @@ container.addEventListener('mouseenter', () => {
 container.addEventListener('mouseleave', () => {
   container.classList.remove('leaflet-control-layers-expanded');
 });
-
 // =========================
 // CARGAR ESTACIONES
 // =========================
 cargarEstaciones(estacionesLayer);
-
 // =========================
 // GEOJSON - DEPARTAMENTOS
 // =========================
@@ -153,7 +151,6 @@ fetch('json/Mapa_limites.geojson')
     geo.eachLayer(layer => departamentosLayer.addLayer(layer));
   })
   .catch(err => console.error("Error departamentos:", err));
-
 // =========================
 // GEOJSON - RÍOS
 // =========================
@@ -171,7 +168,6 @@ fetch('json/bol_rios1m.geojson')
     cargarEstaciones(null);
   }
 });
-
 // =======================
 // CARGAR ESTACIONES
 // =======================
@@ -209,7 +205,6 @@ async function cargarEstaciones(estacionesLayer) {
 
   renderizarEstaciones(estaciones);
 }
-
 // =======================
 // LISTA
 // =======================
@@ -218,9 +213,12 @@ function renderizarEstaciones(estaciones) {
   const selectDepto = document.getElementById("select-depto");
   const selectEst = document.getElementById("select-estacion");
 
+  //  NUEVOS (multi)
+  const multiDepto = document.getElementById("multi-depto");
+  const multiEst = document.getElementById("multi-estacion");
+
   if (!selectDepto || !selectEst) return;
 
-  // agrupar
   const grupos = {};
 
   estaciones.forEach(est => {
@@ -229,18 +227,35 @@ function renderizarEstaciones(estaciones) {
     }
     grupos[est.departamento].push(est.nombre);
   });
+  // =========================
+  // LLENAR DEPARTAMENTOS
+  // =========================
+  const deptos = Object.keys(grupos).sort();
 
-  // llenar departamentos
+  // --- PANEL ORIGINAL
   selectDepto.innerHTML = `<option value="">-- Seleccione --</option>`;
 
-  Object.keys(grupos).sort().forEach(depto => {
+  deptos.forEach(depto => {
     const opt = document.createElement("option");
     opt.value = depto;
     opt.textContent = depto;
     selectDepto.appendChild(opt);
   });
 
-  // evento cambio departamento
+  // --- PANEL MULTI 
+  if (multiDepto) {
+    multiDepto.innerHTML = `<option value="">-- Seleccione --</option>`;
+
+    deptos.forEach(depto => {
+      const opt = document.createElement("option");
+      opt.value = depto;
+      opt.textContent = depto;
+      multiDepto.appendChild(opt);
+    });
+  }
+  // =========================
+  // EVENTO PANEL ORIGINAL
+  // =========================
   selectDepto.addEventListener("change", () => {
 
     const depto = selectDepto.value;
@@ -267,8 +282,56 @@ function renderizarEstaciones(estaciones) {
     });
 
   });
+  // =========================
+  // EVENTO PANEL MULTI 
+  // =========================
+  if (multiDepto && multiEst) {
 
-  // evento cambio estación
+    multiDepto.addEventListener("change", () => {
+
+      const depto = multiDepto.value;
+
+      multiEst.innerHTML = "";
+
+      if (!depto) {
+        multiEst.disabled = true;
+        multiEst.innerHTML = `<option>-- Seleccione un departamento primero --</option>`;
+        return;
+      }
+      multiEst.disabled = false;
+
+      const estacionesDepto = grupos[depto];
+
+      multiEst.innerHTML = `<option value="">-- Seleccione --</option>`;
+
+      estacionesDepto.sort().forEach(nombre => {
+        const opt = document.createElement("option");
+        opt.value = nombre;
+        opt.textContent = nombre;
+        multiEst.appendChild(opt);
+      });
+
+    });
+
+  }
+  // =========================
+  // SELECCIÓN MULTI 
+  // =========================
+  if (multiEst) {
+    multiEst.addEventListener("change", (e) => {
+      const estacion = e.target.value;
+      if (!estacion) return;
+
+      if (!estacionesSeleccionadas.includes(estacion)) {
+        estacionesSeleccionadas.push(estacion);
+        renderSeleccionadas();
+        actualizarGraficoMulti();
+      }
+    });
+  }
+  // =========================
+  // PANEL ORIGINAL (igual)
+  // =========================
   selectEst.addEventListener("change", () => {
     const estacion = selectEst.value;
     if (!estacion) return;
