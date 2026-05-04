@@ -25,7 +25,7 @@ header {
 
 .header-container {
   display: flex;
-  align-items: center;   /* clave: alinea verticalmente */
+  align-items: center;   /* alinea verticalmente */
   justify-content: space-between;
   gap: 1rem;
 
@@ -107,7 +107,7 @@ header {
 }
 
 .arrow.rotate {
-  transform: rotate(-135deg); /* 🔥 gira hacia arriba */
+  transform: rotate(-135deg); 
 }
 
 .header-container h1 {
@@ -878,7 +878,6 @@ input:checked + .slider:before {
   flex-direction: column;
 }
 
-/* tamaños exactos que pediste */
 .fila .campo:first-child {
   width: 30%;
 }
@@ -887,7 +886,6 @@ input:checked + .slider:before {
   width: 30%;
 }
 
-/* estación también 30% */
 .fila:nth-child(2) .campo {
   width: 30%;
 }
