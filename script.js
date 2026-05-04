@@ -744,38 +744,60 @@ function calcularEstadisticos(dataRaw) {
 `;
 }
 
-document.getElementById("btn-descargar").addEventListener("click", () => {
+function descargarDatos(tipo) {
 
-  if (!datosActuales || !estacionActual) return;
+  if (!datosActuales || !estacionActual) {
+    alert("Seleccione una estación primero");
+    return;
+  }
 
   let dataProcesada;
 
   if (modoGrafico === "mensual") {
     dataProcesada = agruparMensualFrontend(datosActuales);
   } else {
-    dataProcesada = datosActuales; // diario original
+    dataProcesada = datosActuales; // diario
   }
 
-  descargarCSV(dataProcesada, estacionActual);
-});
+  const data = unificarFechas(dataProcesada);
 
-function descargarCSV(data, estacion) {
+  let filas = [];
 
-  const fechas = Object.keys(data.base).sort();
+  // encabezado
+  filas.push(["Fecha", "SENAMHI", "IMERG", "CHIRPS"]);
 
-  let csv = "fecha,SENAMHI,IMERG,CHIRPS\n";
-
-  fechas.forEach(f => {
-    csv += `${f},${data.base[f] || 0},${data.imerg[f] || 0},${data.chirps[f] || 0}\n`;
+  data.labels.forEach((fecha, i) => {
+    filas.push([
+      fecha,
+      data.base[i],
+      data.imerg[i],
+      data.chirps[i]
+    ]);
   });
 
+  // filtrar según botón
+  if (tipo !== "all") {
+    const indexMap = {
+      base: 1,
+      imerg: 2,
+      chirps: 3
+    };
+
+    const idx = indexMap[tipo];
+
+    filas = filas.map(row => [row[0], row[idx]]);
+  }
+
+  // convertir a CSV (Excel lo abre perfecto)
+  const csv = filas.map(r => r.join(",")).join("\n");
+
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
 
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${estacionActual}_${tipo}_${modoGrafico}.csv`;
+  a.click();
 
-  const tipo = modoGrafico === "mensual" ? "mensual" : "diario";
-
-  link.download = `${estacion}_${tipo}.csv`;
-  link.click();
+  URL.revokeObjectURL(url);
 }
