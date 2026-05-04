@@ -808,3 +808,22 @@ input:checked + .slider {
 input:checked + .slider:before {
   transform: translateX(20px);
 }
+
+#panel-filtros {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 0 8px rgba(0,0,0,0.1);
+  width: 250px;
+}
+
+#panel-filtros select {
+  width: 100%;
+  padding: 5px;
+  margin-top: 5px;
+}
+
+#panel-filtros label {
+  display: block;
+  margin-top: 10px;
+}
