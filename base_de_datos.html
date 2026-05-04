@@ -75,31 +75,38 @@
   </div>
   
   <!-- GRÁFICA -->
-  <div class="panel">
+  <div id="panel-analisis" class="panel">
 
-  <div class="panel-header">
-    <h2>Análisis de 1 sola estación</h2>
-
-    <div class="toggle-container">
-      <span>Acumulado mensual</span>
-
-      <label class="switch">
-        <input type="checkbox" id="toggleModo">
-        <span class="slider"></span>
-      </label>
-
-      <span>Máximo diario por mes</span>
+    <h2>Análisis</h2>
+  
+    <!-- FILTROS -->
+    <div class="panel-section">
+      <label>Elija departamento:</label>
+      <select id="select-depto"></select>
+  
+      <label>Elija estación:</label>
+      <select id="select-estacion" disabled></select>
     </div>
+  
+    <!-- LOADER -->
+    <div id="loader" class="loader hidden">
+      <span id="texto-loader">Cargando datos...</span>
+    </div>
+  
+    <!-- METRICAS -->
+    <div id="estadisticos"></div>
+  
+    <!-- DESCARGAS -->
+    <div class="panel-section descargas">
+      <h3>Descarga de datos</h3>
+  
+      <button id="btn-descargar">
+        ☁ Descargar datos
+      </button>
+    </div>
+  
   </div>
-
-  <div class="grafico-panel">
-    <h3 id="titulo-estacion"></h3>
-    <canvas id="grafico"></canvas>
-  </div>
-
-  <div id="estadisticos"></div>
-
-</div>
+  
   <div class="descarga-panel">
   <button onclick="descargarDatos('base')">Descargar SENAMHI</button>
   <button onclick="descargarDatos('imerg')">Descargar IMERG</button>
