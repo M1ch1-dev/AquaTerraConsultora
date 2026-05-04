@@ -881,6 +881,7 @@ document.getElementById("multi-estacion")
       actualizarGraficoMulti();
     }
   });
+
 function renderSeleccionadas() {
   const container = document.getElementById("multi-seleccionadas");
   container.innerHTML = "";
@@ -914,7 +915,7 @@ async function actualizarGraficoMulti() {
 
   if (estacionesSeleccionadas.length === 0) return;
 
-  const datasets = [];
+  const series = [];
 
   for (const estacion of estacionesSeleccionadas) {
 
@@ -929,41 +930,148 @@ async function actualizarGraficoMulti() {
       serie = data[datasetSeleccionado];
     }
 
-    const valores = Object.values(serie);
-
-    datasets.push({
-      label: estacion,
-      data: valores,
-      borderWidth: 1.5,
-      tension: 0.2
+    series.push({
+      nombre: estacion,
+      data: serie
     });
   }
 
-  graficarMulti(datasets);
+  const dataFinal = unificarMultiEstaciones(series);
+
+  graficarMulti(dataFinal);
 }
 
 let chartMulti;
 
-function graficarMulti(datasets) {
+function graficarMulti(data) {
 
-  const ctx = document.getElementById("grafico-multi").getContext("2d");
+  const canvas = document.getElementById("grafico-multi");
+  if (!canvas) return;
+
+  const ctx = canvas.getContext("2d");
 
   if (chartMulti) chartMulti.destroy();
 
   chartMulti = new Chart(ctx, {
     type: "line",
     data: {
-      labels: datasets[0].data.map((_, i) => i), // simple index
-      datasets
+      labels: data.labels,
+      datasets: data.datasets
     },
+    plugins: [legendTopRightPlugin, chartAreaBorder], // 🔥 reutilizas
     options: {
       responsive: true,
+      maintainAspectRatio: false,
+
       plugins: {
         title: {
           display: true,
-          text: `Comparación de estaciones (${datasetSeleccionado})`
+          text: `Comparación multi-estación (${datasetSeleccionado.toUpperCase()})`,
+          font: { size: 16, weight: 'bold' }
+        },
+        legend: { display: false }
+      },
+
+      scales: {
+        x: {
+          title: {
+            display: true,
+            text: "Años",
+            font: { size: 12, weight: 'bold' }
+          },
+          ticks: {
+            autoSkip: false,
+            maxRotation: 0,
+            callback: function(value) {
+              const label = this.getLabelForValue(value);
+              const [year, month] = label.split("-");
+              if (month === "01" && parseInt(year) % 2 === 0) {
+                return year;
+              }
+              return "";
+            }
+          }
+        },
+        y: {
+          title: {
+            display: true,
+            text: "Precipitación [mm]",
+            font: { size: 12, weight: 'bold' }
+          },
+          beginAtZero: true
         }
       }
     }
   });
+}
+
+function unificarMultiEstaciones(seriesPorEstacion) {
+
+  const keys = new Set();
+
+  // recolectar todas las fechas
+  seriesPorEstacion.forEach(s => {
+    Object.keys(s.data).forEach(k => keys.add(k));
+  });
+
+  const labels = Array.from(keys).sort();
+
+  const datasets = seriesPorEstacion.map((s, i) => {
+
+    const data = labels.map(f => s.data[f] ?? null);
+
+    return {
+      label: s.nombre,
+      data,
+      borderColor: generarColor(i),
+      backgroundColor: generarColor(i),
+      pointRadius: 2,
+      tension: 0.2,
+      borderWidth: 1.5
+    };
+  });
+
+  return { labels, datasets };
+}
+
+function generarColor(i) {
+  const colores = [
+    "#1f77b4", "#d62728", "#2ca02c",
+    "#9467bd", "#ff7f0e", "#17becf",
+    "#8c564b"
+  ];
+  return colores[i % colores.length];
+}
+
+function calcularMetricasMulti(data) {
+
+  const base = data.datasets[0].data;
+
+  const resultados = data.datasets.slice(1).map(ds => {
+
+    return {
+      nombre: ds.label,
+      nash: nash(base, ds.data),
+      rmse: rmse(base, ds.data),
+      r2: r2(base, ds.data)
+    };
+  });
+
+  return resultados;
+}
+
+function renderMetricasMulti(metricas) {
+
+  const el = document.getElementById("estadisticos-multi");
+  if (!el) return;
+
+  el.innerHTML = `
+    <h3>Métricas (referencia: ${estacionesSeleccionadas[0]})</h3>
+    ${metricas.map(m => `
+      <p><strong>${m.nombre}</strong> |
+      Nash: ${m.nash.toFixed(3)} |
+      R²: ${m.r2.toFixed(3)} |
+      RMSE: ${m.rmse.toFixed(2)}</p>
+    `).join("")}
+  `;
 }
