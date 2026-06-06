@@ -439,7 +439,8 @@ function unificarFechas(data) {
   const keys = new Set([
     ...Object.keys(data.base),
     ...Object.keys(data.imerg),
-    ...Object.keys(data.chirps)
+    ...Object.keys(data.chirps),
+    ...Object.keys(data.era5)
   ]);
 
   const labels = Array.from(keys).sort();
@@ -450,7 +451,8 @@ function unificarFechas(data) {
     labels,
     base: rellenar(data.base),
     imerg: rellenar(data.imerg),
-    chirps: rellenar(data.chirps)
+    chirps: rellenar(data.chirps),
+    era5: rellenar(data.era5)
   };
 }
 
@@ -473,7 +475,8 @@ function agruparMensualFrontend(dataDiario) {
   return {
     base: agrupar(dataDiario.base),
     imerg: agrupar(dataDiario.imerg),
-    chirps: agrupar(dataDiario.chirps)
+    chirps: agrupar(dataDiario.chirps),
+    era5: agrupar(dataDiario.era5)
   };
 }
 
@@ -500,7 +503,8 @@ function agruparMaximoMensual(dataDiario) {
   return {
     base: agrupar(dataDiario.base),
     imerg: agrupar(dataDiario.imerg),
-    chirps: agrupar(dataDiario.chirps)
+    chirps: agrupar(dataDiario.chirps),
+    era5: agrupar(dataDiario.era5)
   };
 }
 
@@ -631,6 +635,19 @@ function graficar(dataRaw) {
           backgroundColor: "#2ca02c",
           pointBackgroundColor: "#2ca02c",
           pointBorderColor: "#2ca02c",
+          pointBorderWidth: 0,
+          pointRadius: 2,
+          pointHoverRadius: 3,
+          borderWidth: 1.5,
+          tension: 0.2
+        },
+        {
+          label: "ERA5",
+          data: data.era5,
+          borderColor: "#9467bd",
+          backgroundColor: "#9467bd",
+          pointBackgroundColor: "#9467bd",
+          pointBorderColor: "#9467bd",
           pointBorderWidth: 0,
           pointRadius: 2,
           pointHoverRadius: 3,
@@ -821,12 +838,15 @@ function calcularEstadisticos(dataRaw) {
 
   const nashI = nash(data.base, data.imerg);
   const nashC = nash(data.base, data.chirps);
+  const nashE = nash(data.base, data.era5);
 
   const rmseI = rmse(data.base, data.imerg);
   const rmseC = rmse(data.base, data.chirps);
+  const rmseE = rmse(data.base, data.era5);
 
   const r2I = r2(data.base, data.imerg);
   const r2C = r2(data.base, data.chirps);
+  const r2E = r2(data.base, data.era5);
 
   const tituloPorcentaje = modoGrafico === "mensual"
   ? "Porcentaje de meses con datos:"
@@ -854,6 +874,10 @@ function calcularEstadisticos(dataRaw) {
       <p><strong>Nash CHIRPS:</strong> ${nashC.toFixed(3)} |
          <strong>R² CHIRPS:</strong> ${r2C.toFixed(3)} |
          <strong>RMSE CHIRPS:</strong> ${rmseC.toFixed(2)}</p>
+
+      <p><strong>Nash ERA5:</strong> ${nashE.toFixed(3)} |
+         <strong>R² ERA5:</strong> ${r2E.toFixed(3)} |
+         <strong>RMSE ERA5:</strong> ${rmseE.toFixed(2)}</p>
     </div>
 
     <div class="stats-center">
