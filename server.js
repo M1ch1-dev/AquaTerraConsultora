@@ -20,7 +20,7 @@ function readCSV(filePath) {
       .pipe(csv())
       .on("data", (row) => {
         const fechaRaw = row.date || row.fecha;
-        const valorRaw = row.tp || row.precip || row.Pr;
+        const valorRaw = row.tp || row.TP || row.Pr;
 
         const fecha = new Date(fechaRaw);
         if (isNaN(fecha)) return;
