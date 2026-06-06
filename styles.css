@@ -1005,8 +1005,12 @@ input:checked + .slider:before {
 }
 
 .footer-logo img {
-  height: 100px;
+  height: 120px;
   width: auto;
+}
+
+.footer-logo-right {
+  margin-left: 40px;
 }
 
 
