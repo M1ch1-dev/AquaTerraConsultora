@@ -113,14 +113,20 @@ app.get("/data/:est", async (req, res) => {
       path.join(__dirname, "Data/CHIRPS/Precip", `${est}.csv`)
     );
 
+    const era5 = await readCSV(
+      path.join(__dirname, "Data/ERA5/Precip", `${est}.csv`)
+    );
+
     res.json({
       base,
       imerg,
       chirps,
+      era5,
 
       base_mensual: agruparMensual(base),
       imerg_mensual: agruparMensual(imerg),
-      chirps_mensual: agruparMensual(chirps)
+      chirps_mensual: agruparMensual(chirps),
+      era5_mensual: agruparMensual(era5)
     });
 
   } catch (err) {
