@@ -997,3 +997,16 @@ input:checked + .slider:before {
   justify-content: space-between;
   padding: 0.5rem 2rem; /* Ajusta según necesites */
 }
+
+.footer-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.footer-logo img {
+  height: 100px;
+  width: auto;
+}
+
+
